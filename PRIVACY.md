@@ -20,7 +20,7 @@ Barepane is built to keep your servers and credentials on your computer.
 
 **Update check.** To tell you about new versions, the app asks the project's public release feed on GitHub (`github.com/usmanbhatti-dev/barepane/releases`) whether a newer version exists. GitHub sees the request the way it sees any download (your IP address and the app version in the request). No identifier is added by Barepane.
 
-You can turn it off in Settings → Updates (automatic checks off). You can then update manually from the releases page.
+You can turn it off in **Help (F1) → About → Check automatically**. With it off, Barepane makes no network request on its own, and you can update manually from the releases page.
 
 ## Changes
 

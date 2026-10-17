@@ -288,10 +288,38 @@ Keep `docs/journal.md` and add one entry per week: what you shipped, what surpri
 
 ## Status tracker
 
-- [ ] Phase 1: Foundation
-- [ ] Phase 2: Legal & branding hygiene
-- [ ] Phase 3: Product hardening
-- [ ] Phase 4: Signing & release pipeline
+Decisions made (2026-10-17): **public, open source (MIT), free.** Monetization is re-evaluated after real usage.
+
+### Done in the repo
+- [x] Git repository initialised, clutter removed, secrets/signing files ignored
+- [x] Project metadata (`package.json`, `LICENSE`, author, repository, bugs, homepage)
+- [x] `SECURITY.md` with real contact options, `PRIVACY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`
+- [x] Issue templates (bug, feature, chooser) and PR template
+- [x] Own visual identity: neutral theme, terminal/editor palettes, new icon (`npm run icons`)
+- [x] Positioning changed from "Ubuntu" to "any Linux VPS", with a Canonical non-affiliation notice
+- [x] Auto-update (opt-in downloads, opt-out checks, restart confirmation) and an About panel
+- [x] Links from the app go only through an allow-list (`shared/links.ts`)
+- [x] Packaging: stable artifact names, GitHub publish target, macOS zip + hardened runtime entitlements
+- [x] CI (`ci.yml`), test packaging (`pack.yml`), tag-triggered draft releases with checksums (`release.yml`)
+- [x] README rewritten as the landing page (fake-data screenshot), release runbook (`docs/releasing.md`)
+- [x] First version set to `0.9.0-beta.1`
+
+### Needs you (cannot be done from the repo)
+- [ ] Create the public GitHub repo `usmanbhatti-dev/barepane` and push (commands in `docs/releasing.md`)
+- [ ] Enable on GitHub: private vulnerability reporting, Dependabot alerts, Discussions, branch protection
+- [ ] Cloudflare DNS, email routing (`hello@`, `support@`, `security@`), redirect barepane.com → the repo
+- [ ] Swap the Gmail address in `SECURITY.md`, `PRIVACY.md`, `CODE_OF_CONDUCT.md`, `package.json` for `@barepane.com`
+- [ ] Trademark / name conflict search for "Barepane"
+- [ ] Apple Developer Program ($99) and the five macOS secrets; Windows signing option
+- [ ] Add a screenshot of the workspace (files + terminal) taken from a demo server; no real hostnames
+- [ ] Test on a real Windows machine and a Linux desktop, and on Debian and Rocky servers
+- [ ] Test the update path once two releases exist (`docs/testing.md` section 18b)
+
+### Phases
+- [~] Phase 1: Foundation (repo side done; GitHub, DNS and email are yours)
+- [x] Phase 2: Legal & branding hygiene (trademark search is still yours)
+- [~] Phase 3: Product hardening (updater done; cross-platform and distro testing is yours)
+- [~] Phase 4: Signing & release pipeline (pipeline done; certificates are yours)
 - [ ] Phase 5: Private beta
-- [ ] Phase 6: Launch assets
+- [ ] Phase 6: Launch assets (README done; demo video and workspace screenshots remain)
 - [ ] Phase 7: Public launch

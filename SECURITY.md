@@ -9,7 +9,7 @@ Please **do not** open a public issue for a security problem.
 1. Preferred: use [GitHub private vulnerability reporting](https://github.com/usmanbhatti-dev/barepane/security/advisories/new).
 2. Or email **usmanbhatti.dev@gmail.com** with the subject `Barepane security`.
 
-Please include the version (Help → About, or the file name you downloaded), your OS, and steps to reproduce.
+Please include the version (Help (F1) → About, or the file name you downloaded), your OS, and steps to reproduce.
 
 What to expect:
 
@@ -37,5 +37,5 @@ Each release includes a `SHA256SUMS.txt`. Compare it with your download:
 
 ```bash
 shasum -a 256 Barepane-*.dmg        # macOS / Linux
-Get-FileHash .\Barepane-Setup-*.exe  # Windows PowerShell
+Get-FileHash .\Barepane-*-win-x64.exe  # Windows PowerShell
 ```
