@@ -1,6 +1,6 @@
 {
   "name": "barepane",
-  "version": "1.0.0",
+  "version": "0.9.0-beta.1",
   "private": true,
   "description": "Desktop workstation for your Linux VPS: files, editor, and a real terminal over plain SSH. Nothing to install on the server.",
   "license": "MIT",
@@ -37,10 +37,13 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json",
     "test": "node --experimental-strip-types --test shared/*.test.ts",
     "build": "vite build",
-    "pack": "vite build && electron-builder --mac --win --linux",
-    "pack:mac": "vite build && electron-builder --mac",
-    "pack:win": "vite build && electron-builder --win",
-    "pack:linux": "vite build && electron-builder --linux"
+    "pack": "npm run pack:mac && npm run pack:win && npm run pack:linux",
+    "pack:mac": "vite build && electron-builder --mac --publish never -c.mac.identity=null",
+    "pack:win": "vite build && electron-builder --win --publish never",
+    "pack:linux": "vite build && electron-builder --linux --x64 --publish never",
+    "icons": "electron scripts/build-icons.mjs",
+    "audit:prod": "npm audit --omit=dev --audit-level=high",
+    "pack:linux:arm64": "vite build && electron-builder --linux --arm64 --publish never"
   },
   "dependencies": {
     "@codemirror/commands": "^6.11.0",
@@ -61,6 +64,7 @@
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/addon-search": "^0.16.0",
     "@xterm/xterm": "^5.5.0",
+    "electron-updater": "^6.8.9",
     "ssh2": "^1.17.0"
   },
   "devDependencies": {
@@ -106,10 +110,19 @@
             "arm64",
             "x64"
           ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
         }
       ],
-      "identity": null,
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
     },
     "win": {
       "icon": "build/icon.ico",
@@ -134,12 +147,15 @@
       "category": "Network",
       "maintainer": "Usman Bhatti <usmanbhatti.dev@gmail.com>",
       "synopsis": "Desktop workstation for your Linux VPS over SSH",
-      "target": [
-        {
-          "target": "AppImage",
-          "arch": ["x64", "arm64"]
-        }
-      ]
-    }
+      "target": "AppImage"
+    },
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "usmanbhatti-dev",
+        "repo": "barepane"
+      }
+    ]
   }
 }
