@@ -67,6 +67,16 @@ function contentSecurityPolicy(): string {
   ].join('; ')
 }
 
+// A dropped SSH socket or a half-closed stream must never show Electron's raw "JavaScript error in the
+// main process" dialog or take other open sessions down. Log one short line locally and carry on.
+function logFault(label: string, error: unknown): void {
+  const text = error instanceof Error ? error.message : String(error)
+  console.error(`[main] ${label}:`, text.split('\n')[0]?.slice(0, 300))
+}
+
+process.on('uncaughtException', (error) => logFault('uncaught exception', error))
+process.on('unhandledRejection', (reason) => logFault('unhandled rejection', reason))
+
 app.on('web-contents-created', (_event, contents) => {
   contents.setWindowOpenHandler(() => ({ action: 'deny' }))
   contents.on('will-navigate', (event, url) => {
@@ -214,6 +224,26 @@ async function createWindow() {
   } else {
     void win.loadFile(indexHtml)
   }
+
+  // If the window's renderer process dies, say so plainly instead of leaving a blank window.
+  win.webContents.on('render-process-gone', (_event, details) => {
+    if (details.reason === 'clean-exit' || !win) return
+    logFault('renderer gone', details.reason)
+    const choice = dialog.showMessageBoxSync(win, {
+      type: 'error',
+      buttons: ['Reload window', 'Quit'],
+      defaultId: 0,
+      cancelId: 1,
+      title: APP_NAME,
+      message: `${APP_NAME}'s window stopped unexpectedly.`,
+      detail: 'Reloading closes your SSH sessions (saved servers are kept). Unsaved editor changes are lost.',
+    })
+    if (choice === 0) {
+      void sessionHub.disconnectAll().finally(() => win?.reload())
+    } else {
+      app.quit()
+    }
+  })
 
   win.once('ready-to-show', () => {
     win?.show()

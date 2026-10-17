@@ -28,7 +28,10 @@ SSH, with nothing installed on the server.
 
 ### Security
 - External links open only from a fixed allow-list in the app, never from arbitrary text
-- Production dependency audit runs in CI
+- Electron fuses: the installed app can no longer be run as a Node interpreter (`ELECTRON_RUN_AS_NODE`), ignores
+  `NODE_OPTIONS`, and only loads code from its integrity-checked archive
+- Production dependency audit and CodeQL code scanning run in CI
+- A dropped connection can no longer trigger Electron's raw crash dialog, and a crashed window offers to reload
 
 ### Notes
 - Windows and Linux builds are newer and less tested than macOS. Reports are welcome

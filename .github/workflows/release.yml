@@ -23,11 +23,11 @@ concurrency:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -53,7 +53,7 @@ jobs:
 
   draft:
     needs: verify
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       # Create the draft once, up front, so the three build jobs do not race to create three drafts.
@@ -80,15 +80,15 @@ jobs:
             args: --mac
           - os: windows-latest
             args: --win
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             args: --linux --x64
-          - os: ubuntu-24.04-arm
+          - os: ubuntu-22.04-arm
             args: --linux --arm64
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -116,8 +116,10 @@ jobs:
               extra="-c.mac.notarize=true"
               echo "macOS: signing and notarizing."
             else
-              extra="-c.mac.identity=null"
-              echo "::warning::macOS secrets not set. Building an UNSIGNED, un-notarized app."
+              # Ad-hoc sign ("-"): Apple Silicon kills any binary whose signature no longer matches, and the
+              # Electron fuses we set modify the binary. The hardened runtime is only for notarized builds.
+              extra="-c.mac.identity=- -c.mac.hardenedRuntime=false"
+              echo "::warning::macOS secrets not set. Building an ad-hoc signed, un-notarized app."
             fi
           fi
           if [ "${{ runner.os }}" = "Windows" ] && [ -z "$WIN_CSC_LINK" ]; then
@@ -127,7 +129,7 @@ jobs:
 
   checksums:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - name: Publish SHA256SUMS.txt to the draft

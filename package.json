@@ -38,7 +38,7 @@
     "test": "node --experimental-strip-types --test shared/*.test.ts",
     "build": "vite build",
     "pack": "npm run pack:mac && npm run pack:win && npm run pack:linux",
-    "pack:mac": "vite build && electron-builder --mac --publish never -c.mac.identity=null",
+    "pack:mac": "vite build && electron-builder --mac --publish never -c.mac.identity=- -c.mac.hardenedRuntime=false",
     "pack:win": "vite build && electron-builder --win --publish never",
     "pack:linux": "vite build && electron-builder --linux --x64 --publish never",
     "icons": "electron scripts/build-icons.mjs",
@@ -156,6 +156,14 @@
         "owner": "usmanbhatti-dev",
         "repo": "barepane"
       }
-    ]
+    ],
+    "electronFuses": {
+      "runAsNode": false,
+      "enableCookieEncryption": true,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true
+    }
   }
 }

@@ -168,7 +168,7 @@ then **Publish release**. Installed apps pick it up within 12 hours or when user
 ## Local test builds
 
 ```bash
-npm run pack:mac       # .dmg + .zip in release/ (unsigned, never published)
+npm run pack:mac       # .dmg + .zip in release/ (ad-hoc signed, never published)
 npm run pack:win       # NSIS installer
 npm run pack:linux     # AppImage x64
 npm run pack:linux:arm64
@@ -184,6 +184,7 @@ npm run icons          # regenerate icons from public/icon.svg
 | Release workflow fails at `verify` | Tag and `package.json` version differ, or the changelog has no section for the version |
 | Three draft releases appear | Should not happen (the `draft` job creates it once). Delete extras, keep the one with assets |
 | macOS app "is damaged" | Unsigned + quarantined. Right-click → Open, or `xattr -dr com.apple.quarantine /Applications/Barepane.app`, or sign the app |
+| macOS app is killed instantly ("Code Signature Invalid") | Electron fuses edit the binary, which breaks its signature. Unsigned builds must be ad-hoc signed (`-c.mac.identity=-`, already set in `pack:mac` and the release workflow). Never use `identity=null` |
 | Auto-update does nothing on macOS | App is unsigned (updates need a signature). Use the releases page, or add signing secrets |
 | Auto-update 404 | The release is still a draft. Publish it |
 | Linux says updates unsupported | Only the AppImage can self-update; `.deb`/extracted builds cannot |

@@ -1,9 +1,18 @@
 name: Pack (test build)
 
 # Builds unsigned installers to prove packaging still works. Nothing is published.
-# Run it by hand, or it runs automatically when packaging-related files change.
+# Runs when packaging-related files change, or by hand from the Actions tab.
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - package.json
+      - package-lock.json
+      - build/**
+      - vite.config.ts
+      - electron/**
+      - .github/workflows/pack.yml
   pull_request:
     paths:
       - package.json
@@ -22,35 +31,42 @@ concurrency:
 
 jobs:
   pack:
+    name: pack (${{ matrix.name }})
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
+          - name: macos
+            os: macos-latest
             script: pack:mac
-          - os: windows-latest
+          - name: windows
+            os: windows-latest
             script: pack:win
-          - os: ubuntu-latest
+          - name: linux-x64
+            os: ubuntu-22.04
             script: pack:linux
-          - os: ubuntu-24.04-arm
+          - name: linux-arm64
+            os: ubuntu-22.04-arm
             script: pack:linux:arm64
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run ${{ matrix.script }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
-          name: barepane-${{ matrix.os }}-${{ matrix.script }}
+          # Artifact names may not contain ":" so use the matrix name, not the script.
+          name: barepane-${{ matrix.name }}
           path: |
             release/*.dmg
             release/*.zip
             release/*.exe
             release/*.AppImage
             release/*.yml
+          if-no-files-found: error
           retention-days: 7

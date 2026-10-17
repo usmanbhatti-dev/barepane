@@ -1,0 +1,7 @@
+# Every change needs a review from the maintainer. Sensitive areas are listed explicitly.
+*                        @usmanbhatti-dev
+/electron/               @usmanbhatti-dev
+/shared/vault.ts         @usmanbhatti-dev
+/shared/security.ts      @usmanbhatti-dev
+/.github/workflows/      @usmanbhatti-dev
+/package.json            @usmanbhatti-dev
