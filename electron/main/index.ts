@@ -4,6 +4,18 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
 import { sessionHub, hasSshAgent } from './ssh'
+import {
+  checkForUpdates,
+  checkFromMenu,
+  downloadUpdate,
+  getAppInfo,
+  getUpdateState,
+  initUpdater,
+  installUpdate,
+  openExternalLink,
+  setAutoCheckUpdates,
+  stopUpdater,
+} from './updater'
 import { APP_NAME } from '../../shared/brand'
 import { formatSshError } from '../../shared/errors'
 import { parseSshConfig, sshHostsToSessions } from '../../shared/sshConfig'
@@ -132,6 +144,17 @@ function installMenu(): void {
       { role: 'editMenu' },
       { role: 'viewMenu' },
       { role: 'windowMenu' },
+      {
+        role: 'help',
+        submenu: [
+          { label: `${APP_NAME} Website`, click: () => void openExternalLink('website') },
+          { label: 'Release Notes', click: () => void openExternalLink('releases') },
+          { label: 'Report an Issue…', click: () => void openExternalLink('issues') },
+          { label: 'Privacy', click: () => void openExternalLink('privacy') },
+          { type: 'separator' },
+          { label: 'Check for Updates…', click: () => void checkFromMenu() },
+        ],
+      },
     ]),
   )
 }
@@ -327,6 +350,41 @@ ipcMain.handle('clipboard:read', (event) => {
 ipcMain.handle('clipboard:write', (event, text: unknown) => {
   assertSender(event)
   clipboard.writeText(typeof text === 'string' ? text : '')
+})
+
+ipcMain.handle('app:info', (event) => {
+  assertSender(event)
+  return getAppInfo()
+})
+
+ipcMain.handle('app:update-state', (event) => {
+  assertSender(event)
+  return getUpdateState()
+})
+
+ipcMain.handle('app:check-updates', (event) => {
+  assertSender(event)
+  return checkForUpdates(true)
+})
+
+ipcMain.handle('app:download-update', (event) => {
+  assertSender(event)
+  return downloadUpdate()
+})
+
+ipcMain.handle('app:install-update', async (event) => {
+  assertSender(event)
+  await installUpdate()
+})
+
+ipcMain.handle('app:set-auto-check', (event, enabled: unknown) => {
+  assertSender(event)
+  return setAutoCheckUpdates(enabled === true)
+})
+
+ipcMain.handle('app:open-link', async (event, id: unknown) => {
+  assertSender(event)
+  await openExternalLink(id)
 })
 
 ipcMain.handle('shell:open-local', async (event, url: unknown) => {
@@ -551,6 +609,10 @@ ipcMain.on('ssh:terminal-ready', (event, id: string, shellId: string) => {
 
 app.whenReady().then(() => {
   hardenSession()
+  initUpdater({
+    onState: (next) => sendToRenderer('app:update-state-changed', next),
+    sessionCount: () => sessionHub.connections().length,
+  })
   void createWindow()
 })
 
@@ -561,6 +623,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('before-quit', () => {
+  stopUpdater()
   void sessionHub.disconnectAll()
 })
 
