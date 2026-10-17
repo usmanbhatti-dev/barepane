@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "types": ["node"],
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["electron", "shared", "vite.config.ts", "package.json"],
+  "exclude": ["**/*.test.ts"]
+}
