@@ -179,7 +179,7 @@ export default function FolderTree({
       <div key={`${path}:${depth}`}>
         <div
           className={`group flex items-center gap-0.5 rounded-md pr-1 text-left text-[13px] ${
-            current ? 'bg-ubuntu text-white' : 'text-white/80 hover:bg-white/8'
+            current ? 'bg-accent text-white' : 'text-white/80 hover:bg-white/8'
           }`}
           style={{ paddingLeft: 4 + depth * 10 }}
           onContextMenu={(event) => onContextMenu?.(event, asFolder(path, label))}

@@ -68,7 +68,7 @@ export default function EditorTabs({ tabs, activePath, onSelect, onChange, onSav
             >
               <span className="truncate">{tab.name}</span>
               {tab.loading ? <span className="tab-spinner" /> : null}
-              {tabDirty && !tab.loading ? <span className="h-1.5 w-1.5 rounded-full bg-ubuntu" /> : null}
+              {tabDirty && !tab.loading ? <span className="h-1.5 w-1.5 rounded-full bg-accent" /> : null}
               <span
                 role="button"
                 tabIndex={0}
@@ -107,7 +107,7 @@ export default function EditorTabs({ tabs, activePath, onSelect, onChange, onSav
             <button type="button" className="rounded-md bg-white/10 px-2 py-0.5 font-semibold hover:bg-white/15" onClick={() => onReload(active.path)}>
               Reload
             </button>
-            <button type="button" className="rounded-md bg-ubuntu px-2 py-0.5 font-semibold" onClick={() => onSave(active.path)}>
+            <button type="button" className="rounded-md bg-accent px-2 py-0.5 font-semibold" onClick={() => onSave(active.path)}>
               Overwrite
             </button>
           </div>
@@ -118,7 +118,7 @@ export default function EditorTabs({ tabs, activePath, onSelect, onChange, onSav
           <button
             type="button"
             disabled={active.loading || !dirty || active.saving}
-            className="rounded-md bg-ubuntu px-2.5 py-1 font-semibold disabled:opacity-40"
+            className="rounded-md bg-accent px-2.5 py-1 font-semibold disabled:opacity-40"
             onClick={() => onSave(active.path)}
           >
             {active.saving ? 'Saving…' : 'Save'}

@@ -330,5 +330,3 @@ export type BarepaneApi = {
   onDisconnected: (callback: (sessionId: string, reason: string) => void) => () => void
   onTransfer: (callback: (sessionId: string, transfer: TransferProgress) => void) => () => void
 }
-
-export type UbuntuApi = BarepaneApi

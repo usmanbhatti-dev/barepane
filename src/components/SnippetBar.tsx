@@ -54,21 +54,21 @@ export default function SnippetBar({ cwd, canBroadcast, onRun, onRunAllShells, o
           title={snippet.command}
           onClick={() => onRun(snippet.command)}
           onContextMenu={(event) => openMenu(event, snippet)}
-          className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-ubuntu"
+          className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-accent"
         >
           {snippet.name}
         </button>
       ))}
       <button
         type="button"
-        className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-ubuntu"
+        className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-accent"
         onClick={() => onRun(`cd ${shellQuote(cwd)}`)}
       >
         Jump to files
       </button>
       <button
         type="button"
-        className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-ubuntu"
+        className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-accent"
         onClick={() => setEditing(null)}
       >
         Add

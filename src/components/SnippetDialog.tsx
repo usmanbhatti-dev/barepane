@@ -49,7 +49,7 @@ export default function SnippetDialog({ snippet, onCancel, onSave }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 px-4" onMouseDown={onCancel}>
       <form
-        className="w-full max-w-md rounded-xl border border-white/10 bg-[#2a2a2a] p-4 shadow-2xl"
+        className="w-full max-w-md rounded-xl border border-white/10 bg-surface p-4 shadow-2xl"
         onMouseDown={(event) => event.stopPropagation()}
         onSubmit={submit}
       >
@@ -82,7 +82,7 @@ export default function SnippetDialog({ snippet, onCancel, onSave }: Props) {
           <button type="button" className="rounded-lg bg-white/10 px-3 py-1.5 text-sm hover:bg-white/15" onClick={onCancel}>
             Cancel
           </button>
-          <button type="submit" className="rounded-lg bg-ubuntu px-3 py-1.5 text-sm font-semibold hover:bg-[#ff6a33]">
+          <button type="submit" className="rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold hover:bg-accent-hover">
             Save
           </button>
         </div>

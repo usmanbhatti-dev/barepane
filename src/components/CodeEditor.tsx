@@ -24,32 +24,32 @@ type Props = {
 }
 
 const highlightStyle = HighlightStyle.define([
-  { tag: tags.keyword, color: '#E95420' },
-  { tag: tags.controlKeyword, color: '#E95420' },
-  { tag: tags.definitionKeyword, color: '#E95420' },
-  { tag: tags.moduleKeyword, color: '#E95420' },
-  { tag: tags.atom, color: '#FCE94F' },
-  { tag: tags.bool, color: '#FCE94F' },
-  { tag: tags.number, color: '#FCE94F' },
-  { tag: tags.string, color: '#8AE234' },
-  { tag: tags.special(tags.string), color: '#8AE234' },
-  { tag: tags.comment, color: '#9A9A90', fontStyle: 'italic' },
-  { tag: tags.lineComment, color: '#9A9A90', fontStyle: 'italic' },
-  { tag: tags.blockComment, color: '#9A9A90', fontStyle: 'italic' },
-  { tag: tags.variableName, color: '#EEEEEC' },
-  { tag: tags.definition(tags.variableName), color: '#729FCF' },
-  { tag: tags.propertyName, color: '#AD7FA8' },
-  { tag: tags.attributeName, color: '#AD7FA8' },
-  { tag: tags.className, color: '#34E2E2' },
-  { tag: tags.typeName, color: '#34E2E2' },
-  { tag: tags.tagName, color: '#E95420' },
-  { tag: tags.operator, color: '#D3D7CF' },
-  { tag: tags.punctuation, color: '#D3D7CF' },
-  { tag: tags.heading, color: '#E95420', fontWeight: 'bold' },
-  { tag: tags.link, color: '#729FCF', textDecoration: 'underline' },
-  { tag: tags.url, color: '#34E2E2' },
-  { tag: tags.meta, color: '#C4A000' },
-  { tag: tags.invalid, color: '#EF2929' },
+  { tag: tags.keyword, color: '#C678DD' },
+  { tag: tags.controlKeyword, color: '#C678DD' },
+  { tag: tags.definitionKeyword, color: '#C678DD' },
+  { tag: tags.moduleKeyword, color: '#C678DD' },
+  { tag: tags.atom, color: '#D19A66' },
+  { tag: tags.bool, color: '#D19A66' },
+  { tag: tags.number, color: '#D19A66' },
+  { tag: tags.string, color: '#98C379' },
+  { tag: tags.special(tags.string), color: '#98C379' },
+  { tag: tags.comment, color: '#7F848E', fontStyle: 'italic' },
+  { tag: tags.lineComment, color: '#7F848E', fontStyle: 'italic' },
+  { tag: tags.blockComment, color: '#7F848E', fontStyle: 'italic' },
+  { tag: tags.variableName, color: '#D7DAE0' },
+  { tag: tags.definition(tags.variableName), color: '#61AFEF' },
+  { tag: tags.propertyName, color: '#E06C75' },
+  { tag: tags.attributeName, color: '#D19A66' },
+  { tag: tags.className, color: '#E5C07B' },
+  { tag: tags.typeName, color: '#E5C07B' },
+  { tag: tags.tagName, color: '#E06C75' },
+  { tag: tags.operator, color: '#56B6C2' },
+  { tag: tags.punctuation, color: '#ABB2BF' },
+  { tag: tags.heading, color: '#61AFEF', fontWeight: 'bold' },
+  { tag: tags.link, color: '#61AFEF', textDecoration: 'underline' },
+  { tag: tags.url, color: '#56B6C2' },
+  { tag: tags.meta, color: '#E5C07B' },
+  { tag: tags.invalid, color: '#FF6B6B' },
 ])
 
 const editorTheme = EditorView.theme(
@@ -60,20 +60,20 @@ const editorTheme = EditorView.theme(
       color: '#f6f6f6',
     },
     '.cm-scroller': {
-      fontFamily: 'Ubuntu Mono, Menlo, Monaco, monospace',
+      fontFamily: 'JetBrains Mono, SF Mono, Menlo, Cascadia Mono, Consolas, Ubuntu Mono, monospace',
       fontSize: '12.5px',
       lineHeight: '1.45',
       overflow: 'auto',
     },
     '.cm-content': {
-      caretColor: '#E95420',
+      caretColor: '8DA4EF',
       padding: '8px 0',
     },
     '.cm-cursor, .cm-dropCursor': {
-      borderLeftColor: '#E95420',
+      borderLeftColor: '8DA4EF',
     },
     '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection': {
-      backgroundColor: '#E9542044',
+      backgroundColor: '#3D63DD55',
     },
     '.cm-activeLine': {
       backgroundColor: '#ffffff08',
@@ -82,7 +82,7 @@ const editorTheme = EditorView.theme(
       backgroundColor: '#ffffff08',
     },
     '.cm-gutters': {
-      backgroundColor: '#141414',
+      backgroundColor: '#0d1117',
       color: '#6f6f6f',
       borderRight: '1px solid #ffffff14',
     },
@@ -90,17 +90,17 @@ const editorTheme = EditorView.theme(
       color: '#888',
     },
     '.cm-matchingBracket': {
-      backgroundColor: '#E9542033',
-      outline: '1px solid #E95420',
+      backgroundColor: '#3D63DD33',
+      outline: '1px solid #3D63DD',
     },
     '.cm-searchMatch': {
-      backgroundColor: '#C4A00066',
+      backgroundColor: '#E5C07B55',
     },
     '.cm-searchMatch.cm-searchMatch-selected': {
-      backgroundColor: '#E9542088',
+      backgroundColor: '#3D63DD99',
     },
     '.cm-panels': {
-      backgroundColor: '#1a1a1a',
+      backgroundColor: '#11151b',
       color: '#f6f6f6',
       borderBottom: '1px solid #ffffff14',
     },
@@ -109,7 +109,7 @@ const editorTheme = EditorView.theme(
     },
     '.cm-panel.cm-search': {
       padding: '8px 28px 8px 10px',
-      fontFamily: 'Ubuntu, Cantarell, Segoe UI, sans-serif',
+      fontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif',
     },
     '.cm-search .cm-textfield': {
       width: '11rem',
@@ -124,8 +124,8 @@ const editorTheme = EditorView.theme(
       outline: 'none',
     },
     '.cm-search .cm-textfield:focus': {
-      borderColor: '#E95420',
-      boxShadow: '0 0 0 2px rgba(233,84,32,0.22)',
+      borderColor: '#3D63DD',
+      boxShadow: '0 0 0 2px rgba(61,99,221,0.28)',
     },
     '.cm-search .cm-button': {
       height: '1.7rem',
@@ -143,11 +143,11 @@ const editorTheme = EditorView.theme(
       backgroundColor: 'rgba(255,255,255,0.16)',
     },
     '.cm-search button[name=replace], .cm-search button[name=replaceAll]': {
-      backgroundColor: '#E95420',
+      backgroundColor: '#3D63DD',
       color: '#fff',
     },
     '.cm-search button[name=replace]:hover, .cm-search button[name=replaceAll]:hover': {
-      backgroundColor: '#ff6a33',
+      backgroundColor: '#5173E8',
     },
     '.cm-search label': {
       margin: '3px 10px 3px 0',
@@ -155,7 +155,7 @@ const editorTheme = EditorView.theme(
       color: 'rgba(255,255,255,0.6)',
     },
     '.cm-search input[type=checkbox]': {
-      accentColor: '#E95420',
+      accentColor: '#3D63DD',
       marginRight: '4px',
     },
     '.cm-search button[name=close]': {

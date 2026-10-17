@@ -43,7 +43,7 @@ export default function FileDialog({
   return (
     <div className={`fixed inset-0 ${secret ? 'z-[80]' : 'z-50'} flex items-center justify-center bg-black/55 px-4`} onMouseDown={onCancel}>
       <form
-        className="w-full max-w-sm rounded-xl border border-white/10 bg-[#2a2a2a] p-4 shadow-2xl"
+        className="w-full max-w-sm rounded-xl border border-white/10 bg-surface p-4 shadow-2xl"
         onMouseDown={(event) => event.stopPropagation()}
         onSubmit={(event) => {
           event.preventDefault()

@@ -111,7 +111,7 @@ export default function TunnelPanel({ tunnels, open, busy, error, onClose, onAdd
                   type="button"
                   onClick={() => setKind(item.id)}
                   className={`flex-1 rounded-md px-2 py-1 text-xs font-semibold ${
-                    kind === item.id ? 'bg-ubuntu text-white' : 'text-white/65 hover:bg-white/8'
+                    kind === item.id ? 'bg-accent text-white' : 'text-white/65 hover:bg-white/8'
                   }`}
                 >
                   {item.label}

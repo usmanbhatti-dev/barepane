@@ -671,7 +671,7 @@ export default function FileExplorer({
 
   return (
     <div ref={paneRef} className="flex h-full min-h-0 outline-none" tabIndex={0} onKeyDown={onPaneKey}>
-      <aside className="flex w-56 shrink-0 flex-col border-r border-white/10 bg-[#161616]">
+      <aside className="flex w-56 shrink-0 flex-col border-r border-white/10 bg-surface-2">
         <div className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/35">
           Folders
         </div>
@@ -730,7 +730,7 @@ export default function FileExplorer({
               type="button"
               onClick={() => goTo(bookmark.path)}
               className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm ${
-                cwd === bookmark.path ? 'bg-ubuntu text-white' : 'text-white/80 hover:bg-white/8'
+                cwd === bookmark.path ? 'bg-accent text-white' : 'text-white/80 hover:bg-white/8'
               }`}
             >
               <Glyph kind="folder" />
@@ -757,12 +757,12 @@ export default function FileExplorer({
             </IconButton>
           </div>
           <div className="flex min-w-0 flex-1 items-center overflow-hidden rounded-md bg-black/35 px-2 py-1 font-mono text-xs text-white/75">
-            <button type="button" className="shrink-0 hover:text-ubuntu" onClick={() => goTo('/')}>/</button>
+            <button type="button" className="shrink-0 hover:text-accent-fg" onClick={() => goTo('/')}>/</button>
             {crumbs.map((part, index) => {
               const path = `/${crumbs.slice(0, index + 1).join('/')}`
               return (
                 <span key={path} className="flex min-w-0 items-center">
-                  <button type="button" className="truncate hover:text-ubuntu" onClick={() => goTo(path)}>
+                  <button type="button" className="truncate hover:text-accent-fg" onClick={() => goTo(path)}>
                     {part}
                   </button>
                   {index < crumbs.length - 1 ? <span className="px-0.5 text-white/30">/</span> : null}
@@ -879,7 +879,7 @@ export default function FileExplorer({
             >
               <Glyph kind={bookmarks.some((item) => item.path === cwd) ? 'bookmark-on' : 'bookmark'} />
             </button>
-            <button type="button" className="rounded-md bg-ubuntu px-2.5 py-1.5 text-xs font-semibold" onClick={() => onOpenInTerminal(cwd)}>
+            <button type="button" className="rounded-md bg-accent px-2.5 py-1.5 text-xs font-semibold" onClick={() => onOpenInTerminal(cwd)}>
               Terminal here
             </button>
           </div>
@@ -939,7 +939,7 @@ export default function FileExplorer({
           {error && files.length === 0 ? <div className="px-4 py-6 text-sm text-red-300">{error}</div> : null}
           {contentHits ? (
             <table className="w-full text-left text-sm">
-              <thead className="sticky top-0 bg-[#222] text-[11px] uppercase tracking-wider text-white/40">
+              <thead className="sticky top-0 bg-surface text-[11px] uppercase tracking-wider text-white/40">
                 <tr>
                   <th className="px-3 py-2 font-medium">File</th>
                   <th className="px-3 py-2 font-medium">Line</th>
@@ -981,7 +981,7 @@ export default function FileExplorer({
             </table>
           ) : files.length > 0 || (!busy && !error) ? (
             <table className="w-full text-left text-sm">
-              <thead className="sticky top-0 bg-[#222] text-[11px] uppercase tracking-wider text-white/40">
+              <thead className="sticky top-0 bg-surface text-[11px] uppercase tracking-wider text-white/40">
                 <tr>
                   <SortHeader label="Name" column="name" active={sortKey} dir={sortDir} onSort={toggleSort} />
                   <SortHeader
@@ -1004,7 +1004,7 @@ export default function FileExplorer({
                   filtered.map((file) => (
                     <tr
                       key={file.path}
-                      className={`file-row cursor-default ${freshPaths.has(file.path) ? 'file-row-enter' : ''} ${selectedSet.has(file.path) ? 'bg-ubuntu/30' : 'hover:bg-white/5'}`}
+                      className={`file-row cursor-default ${freshPaths.has(file.path) ? 'file-row-enter' : ''} ${selectedSet.has(file.path) ? 'bg-accent/30' : 'hover:bg-white/5'}`}
                       onClick={(event) => selectFiles(file, event)}
                       onDoubleClick={() => void openFile(file)}
                       onContextMenu={(event) => openMenu(event, file)}
@@ -1083,7 +1083,7 @@ function SortHeader({
         className={`inline-flex items-center gap-1 hover:text-white ${selected ? 'text-white/80' : ''}`}
       >
         {label}
-        {selected ? <span className="text-[10px] text-ubuntu">{dir === 'asc' ? '↑' : '↓'}</span> : null}
+        {selected ? <span className="text-[10px] text-accent-fg">{dir === 'asc' ? '↑' : '↓'}</span> : null}
       </button>
     </th>
   )

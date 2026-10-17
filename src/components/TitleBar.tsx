@@ -50,7 +50,7 @@ export default function TitleBar({
   return (
     <header
       aria-label={label}
-      className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-white/10 bg-aubergine px-3"
+      className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-white/10 bg-canvas px-3"
     >
       <div className="flex rounded-lg bg-black/30 p-0.5" role="group" aria-label="Layout">
         {LAYOUTS.map((item) => (
@@ -59,7 +59,7 @@ export default function TitleBar({
             type="button"
             onClick={() => onLayoutChange(item.id)}
             className={`rounded-md px-2.5 py-1 text-xs font-semibold ${
-              layout === item.id ? 'bg-ubuntu text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
+              layout === item.id ? 'bg-accent text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
             }`}
           >
             {item.label}
@@ -97,7 +97,7 @@ export default function TitleBar({
             Site
           </button>
           {siteOpen ? (
-            <div className="absolute right-0 z-30 mt-1 w-52 rounded-lg border border-white/10 bg-[#2a2a2a] py-1 shadow-xl">
+            <div className="absolute right-0 z-30 mt-1 w-52 rounded-lg border border-white/10 bg-surface py-1 shadow-xl">
               {SITE_ACTIONS.map((action) => (
                 <button
                   key={action}

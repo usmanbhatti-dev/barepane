@@ -21,7 +21,7 @@ export default function Glyph({ kind, className = 'h-4 w-4' }: Props) {
   }
   if (kind === 'home') {
     return (
-      <svg viewBox="0 0 16 16" className={`${common} text-ubuntu`} fill="currentColor" aria-hidden>
+      <svg viewBox="0 0 16 16" className={`${common} text-accent-fg`} fill="currentColor" aria-hidden>
         <path d="M8 2.2 2.4 7.1a.8.8 0 0 0-.3.6V13a1 1 0 0 0 1 1h3.2V10h3.4v4H13a1 1 0 0 0 1-1V7.7a.8.8 0 0 0-.3-.6z" />
       </svg>
     )
@@ -74,7 +74,7 @@ export default function Glyph({ kind, className = 'h-4 w-4' }: Props) {
   }
   if (kind === 'bookmark-on') {
     return (
-      <svg viewBox="0 0 16 16" className={`${common} text-ubuntu`} fill="currentColor" aria-hidden>
+      <svg viewBox="0 0 16 16" className={`${common} text-accent-fg`} fill="currentColor" aria-hidden>
         <path d="M4 2.75A1.75 1.75 0 0 1 5.75 1h4.5A1.75 1.75 0 0 1 12 2.75v11.4a.75.75 0 0 1-1.16.63L8 12.4l-2.84 2.38A.75.75 0 0 1 4 14.15z" />
       </svg>
     )

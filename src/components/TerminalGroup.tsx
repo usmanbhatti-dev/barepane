@@ -130,7 +130,7 @@ export default function TerminalGroup({
               type="button"
               onClick={() => select(id)}
               className={`flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[11px] ${
-                activeId === id ? 'bg-ubuntu text-white' : 'bg-white/10 hover:bg-white/15'
+                activeId === id ? 'bg-accent text-white' : 'bg-white/10 hover:bg-white/15'
               }`}
             >
               {index + 1}
@@ -147,7 +147,7 @@ export default function TerminalGroup({
               ) : null}
             </button>
           ))}
-          <button type="button" className="rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-ubuntu" onClick={() => void addShell()}>
+          <button type="button" className="rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-accent" onClick={() => void addShell()}>
             +
           </button>
         </div>
@@ -161,7 +161,7 @@ export default function TerminalGroup({
         {shells.length > 1 ? (
           <button
             type="button"
-            className={`shrink-0 rounded-md px-2 py-1 text-[11px] ${split ? 'bg-ubuntu' : 'bg-white/10 hover:bg-ubuntu'}`}
+            className={`shrink-0 rounded-md px-2 py-1 text-[11px] ${split ? 'bg-accent' : 'bg-white/10 hover:bg-accent'}`}
             onClick={() => setSplit((value) => !value)}
           >
             Split
@@ -169,19 +169,19 @@ export default function TerminalGroup({
         ) : null}
         <button
           type="button"
-          className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-ubuntu"
+          className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-accent"
           onClick={() => setFontSize((n) => Math.max(10, n - 1))}
         >
           A−
         </button>
         <button
           type="button"
-          className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-ubuntu"
+          className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-accent"
           onClick={() => setFontSize((n) => Math.min(22, n + 1))}
         >
           A+
         </button>
-        <button type="button" className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-ubuntu" onClick={() => setSearchRequest((n) => n + 1)}>
+        <button type="button" className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-accent" onClick={() => setSearchRequest((n) => n + 1)}>
           Find
         </button>
         <input
@@ -191,13 +191,13 @@ export default function TerminalGroup({
             if (event.key === 'Enter') runBroadcast(event.shiftKey && Boolean(canBroadcast))
           }}
           placeholder="Run on all…"
-          className="h-7 w-32 shrink-0 rounded-md border border-white/10 bg-black/25 px-2 text-[11px] outline-none focus:border-ubuntu"
+          className="h-7 w-32 shrink-0 rounded-md border border-white/10 bg-black/25 px-2 text-[11px] outline-none focus:border-accent"
         />
-        <button type="button" className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-ubuntu" onClick={() => runBroadcast(false)}>
+        <button type="button" className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-accent" onClick={() => runBroadcast(false)}>
           All shells
         </button>
         {canBroadcast ? (
-          <button type="button" className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-ubuntu" onClick={() => runBroadcast(true)}>
+          <button type="button" className="shrink-0 rounded-md bg-white/10 px-2 py-1 text-[11px] hover:bg-accent" onClick={() => runBroadcast(true)}>
             All servers
           </button>
         ) : null}
@@ -229,7 +229,7 @@ export default function TerminalGroup({
                   type="button"
                   aria-label="Resize terminals"
                   onMouseDown={startSplitResize}
-                  className="h-1.5 shrink-0 cursor-row-resize bg-white/5 hover:bg-ubuntu"
+                  className="h-1.5 shrink-0 cursor-row-resize bg-white/5 hover:bg-accent"
                 />
               ) : null}
             </div>

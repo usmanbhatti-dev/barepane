@@ -157,7 +157,7 @@ export default function RuntimePanel({ sessionId, open, onClose, onOpenPath, onF
               type="button"
               onClick={() => setTab(item.id)}
               className={`rounded-md px-3 py-1 text-xs font-semibold ${
-                tab === item.id ? 'bg-ubuntu text-white' : 'text-white/65 hover:bg-white/8'
+                tab === item.id ? 'bg-accent text-white' : 'text-white/65 hover:bg-white/8'
               }`}
             >
               {item.label}
@@ -210,7 +210,7 @@ export default function RuntimePanel({ sessionId, open, onClose, onOpenPath, onF
                           {dash.open && onOpenDashboard ? (
                             <button
                               type="button"
-                              className="text-[11px] text-ubuntu hover:text-white"
+                              className="text-[11px] text-accent-fg hover:text-white"
                               disabled={Boolean(working)}
                               onClick={() => void openDashboard(dash.port)}
                             >
@@ -234,7 +234,7 @@ export default function RuntimePanel({ sessionId, open, onClose, onOpenPath, onF
                           <div className="truncate text-[11px] text-white/45">
                             {site.kind === 'proxy' ? `Proxy → ${site.proxy}` : site.kind === 'static' ? `Static ${site.root}` : 'Site'}
                           </div>
-                          <button type="button" className="mt-1 text-[11px] text-ubuntu hover:text-white" onClick={() => onOpenPath(site.file)}>
+                          <button type="button" className="mt-1 text-[11px] text-accent-fg hover:text-white" onClick={() => onOpenPath(site.file)}>
                             Open config
                           </button>
                         </li>

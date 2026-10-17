@@ -525,7 +525,7 @@ export default function LoginScreen({ onConnected, reconnectMessage, onCancel }:
               key={file}
               type="button"
               className={`rounded-md px-2 py-0.5 text-[11px] ${
-                form.privateKeyPath === file ? 'bg-ubuntu text-white' : 'bg-white/8 text-white/65 hover:bg-white/12'
+                form.privateKeyPath === file ? 'bg-accent text-white' : 'bg-white/8 text-white/65 hover:bg-white/12'
               }`}
               onClick={() => patch({ privateKeyPath: file === form.privateKeyPath ? '' : file })}
             >
@@ -687,7 +687,7 @@ export default function LoginScreen({ onConnected, reconnectMessage, onCancel }:
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-white/45">Saved servers</h2>
           <div className="flex items-center gap-2">
-            <button type="button" className="text-[11px] font-semibold text-ubuntu hover:text-white" onClick={startNew}>
+            <button type="button" className="text-[11px] font-semibold text-accent-fg hover:text-white" onClick={startNew}>
               New
             </button>
             <button type="button" className="text-[11px] text-white/50 hover:text-white" onClick={() => void exportServers()}>
@@ -730,7 +730,7 @@ export default function LoginScreen({ onConnected, reconnectMessage, onCancel }:
                   </button>
                   <button
                     type="button"
-                    className="px-1.5 text-[11px] font-semibold text-ubuntu hover:text-white disabled:opacity-40"
+                    className="px-1.5 text-[11px] font-semibold text-accent-fg hover:text-white disabled:opacity-40"
                     disabled={busy}
                     onClick={() => void connectSaved(session)}
                   >
@@ -769,11 +769,11 @@ export default function LoginScreen({ onConnected, reconnectMessage, onCancel }:
               </button>
             </div>
           ) : vaultExists ? (
-            <button type="button" className="mt-1.5 text-[11px] font-semibold text-ubuntu hover:text-white" onClick={() => setVaultMode('unlock')}>
+            <button type="button" className="mt-1.5 text-[11px] font-semibold text-accent-fg hover:text-white" onClick={() => setVaultMode('unlock')}>
               Unlock to fill saved passwords
             </button>
           ) : (
-            <button type="button" className="mt-1.5 text-[11px] font-semibold text-ubuntu hover:text-white" onClick={() => setVaultMode('create')}>
+            <button type="button" className="mt-1.5 text-[11px] font-semibold text-accent-fg hover:text-white" onClick={() => setVaultMode('create')}>
               Set master password
             </button>
           )}
@@ -784,7 +784,7 @@ export default function LoginScreen({ onConnected, reconnectMessage, onCancel }:
           <img src="./icon.svg" alt="" className="h-10 w-10 shrink-0 rounded-[10px]" />
           <div className="min-w-0">
             <h1 className="text-lg font-semibold leading-tight">{overlay ? 'Add server' : APP_NAME}</h1>
-            <p className="text-xs leading-5 text-white/50">Headless Ubuntu over SSH — files, editor, and a real shell</p>
+            <p className="text-xs leading-5 text-white/50">Your Linux VPS over SSH — files, editor, and a real shell</p>
           </div>
           <button type="button" className="ml-auto shrink-0 text-xs font-semibold text-white/50 hover:text-white" onClick={openHelp}>
             Help
@@ -842,8 +842,8 @@ export default function LoginScreen({ onConnected, reconnectMessage, onCancel }:
 
   if (overlay) {
     return (
-      <div className="absolute inset-0 z-40 flex min-h-0 flex-col bg-aubergine/95">
-        <div className="chrome-inset app-drag h-10 shrink-0 bg-[#1a0014]" />
+      <div className="absolute inset-0 z-40 flex min-h-0 flex-col bg-canvas/95">
+        <div className="chrome-inset app-drag h-10 shrink-0 bg-chrome" />
         <div className="login-scroll app-no-drag relative min-h-0 flex-1">{body}</div>
         {vaultDialog}
         <HelpOverlay open={showHelp} onClose={closeHelp} />
@@ -852,10 +852,10 @@ export default function LoginScreen({ onConnected, reconnectMessage, onCancel }:
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-aubergine">
-      <div className="chrome-inset app-drag h-10 shrink-0 bg-[#1a0014]" />
+    <div className="flex h-full min-h-0 flex-col bg-canvas">
+      <div className="chrome-inset app-drag h-10 shrink-0 bg-chrome" />
       <div className="login-scroll app-no-drag relative min-h-0 flex-1">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(233,84,32,0.16),_transparent_50%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(61,99,221,0.18),_transparent_50%)]" />
         {body}
       </div>
       {vaultDialog}
