@@ -29,7 +29,7 @@ npm test
 npm run typecheck
 ```
 
-**Pass:** 49 tests, no TypeScript errors.
+**Pass:** all unit tests pass (the count grows over time) and there are no TypeScript errors.
 
 Then start the app:
 
@@ -37,7 +37,7 @@ Then start the app:
 npm run dev
 ```
 
-**Pass:** a native **Barepane** window opens (aubergine login). If you already had an old window open after main/preload changes, quit it and start `npm run dev` again.
+**Pass:** a native **Barepane** window opens (dark slate login screen with a blue Connect button). If you already had an old window open after main/preload changes, quit it and start `npm run dev` again.
 
 ---
 
@@ -343,6 +343,24 @@ Invalid port / bind in use → error in the panel, app stays up.
 
 ---
 
+## 18b. About, updates, and links
+
+1. Press **F1**. Scroll to **About**. **Pass:** shows `Barepane <version> · <OS> <arch> · Electron <version>`.
+2. In development (`npm run dev`) the update line says updates are only checked in installed builds, and **Check for updates** is disabled. **Pass.**
+3. In an **installed** build, click **Check for updates**.
+   - No release published yet / offline → a plain-language message, no raw error text, no banner.
+   - You are on the latest version → "You are on the latest version."
+   - A newer release exists → a banner appears: **Download** (nothing restarts), then **Restart to update**. With an SSH session open, restart asks for confirmation first.
+4. Untick **Check automatically**, quit, reopen. **Pass:** it stays unticked (stored in the app's `settings.json`), and no background check runs.
+5. Menu **Help → Check for Updates…** shows a dialog with the result.
+6. Click each link in About and the Help menu. **Pass:** each opens the right page in your normal browser. The app never navigates itself.
+7. Run with `BAREPANE_DISABLE_UPDATES=1`. **Pass:** About says automatic updates are turned off.
+
+**Update path test (first time per platform, once two releases exist):** install the *older* installer, publish the newer release,
+open the old app, and follow step 3. **Pass:** it ends on the new version and saved servers are still there.
+
+---
+
 ## 19. Packaging (optional, after UI is green)
 
 ```bash
@@ -354,6 +372,8 @@ npm run pack:linux  # Linux — AppImage in release/
 1. Install / open the artifact (unsigned Mac: right-click → Open the first time).
 2. Repeat **Login (password)** and **File explorer browse** on the packaged app.
 3. **Pass:** no Vite URL, no “desktop app” empty state, SSH still works.
+4. Artifact names have no spaces (`Barepane-<version>-<os>-<arch>.<ext>`). Spaces break auto-update on GitHub.
+5. `release/latest*.yml` exists. The updater reads it.
 
 ---
 
@@ -393,3 +413,4 @@ Record host OS (macOS/Windows), Node version, and whether you used password, key
 - [ ] Logs + services
 - [ ] VPS health panel
 - [ ] Multi-session + disconnect warnings
+- [ ] About shows the right version; update check behaves (section 18b)

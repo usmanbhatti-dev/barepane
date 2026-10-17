@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea
+    url: https://github.com/usmanbhatti-dev/barepane/discussions
+    about: Ask how something works or float an idea before opening an issue.
+  - name: Security vulnerability
+    url: https://github.com/usmanbhatti-dev/barepane/security/advisories/new
+    about: Please report security problems privately, not as a public issue.
