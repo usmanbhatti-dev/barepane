@@ -161,14 +161,14 @@ async function createWindow() {
     height: 900,
     minWidth: 1024,
     minHeight: 680,
-    backgroundColor: '#2C001E',
+    backgroundColor: '#0F1218',
     ...(icon ? { icon } : {}),
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'hidden',
     trafficLightPosition: { x: 14, y: 14 },
     ...(process.platform === 'win32'
       ? {
           titleBarOverlay: {
-            color: '#1a0014',
+            color: '#0a0d12',
             symbolColor: '#f6f6f6',
             height: 40,
           },

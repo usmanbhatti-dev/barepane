@@ -245,7 +245,7 @@ export default function LogPanel({
                 type="button"
                 onClick={() => setKind(item)}
                 className={`flex-1 rounded-md px-2 py-1 text-xs font-semibold ${
-                  kind === item ? 'bg-ubuntu text-white' : 'text-white/65 hover:bg-white/8'
+                  kind === item ? 'bg-accent text-white' : 'text-white/65 hover:bg-white/8'
                 }`}
               >
                 {item === 'journal' ? 'Journal' : 'File'}
@@ -261,7 +261,7 @@ export default function LogPanel({
                     type="button"
                     onClick={() => setUnit(item.unit)}
                     className={`rounded-md px-2 py-1 text-[11px] ${
-                      unit === item.unit ? 'bg-ubuntu' : 'bg-white/10 hover:bg-white/15'
+                      unit === item.unit ? 'bg-accent' : 'bg-white/10 hover:bg-white/15'
                     }`}
                   >
                     {item.label}
@@ -306,7 +306,7 @@ export default function LogPanel({
                     type="button"
                     onClick={() => setPath(item.path)}
                     className={`rounded-md px-2 py-1 text-[11px] ${
-                      path === item.path ? 'bg-ubuntu' : 'bg-white/10 hover:bg-white/15'
+                      path === item.path ? 'bg-accent' : 'bg-white/10 hover:bg-white/15'
                     }`}
                   >
                     {item.label}
@@ -337,7 +337,7 @@ export default function LogPanel({
                 type="button"
                 onClick={() => setActiveId(item.id)}
                 className={`flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[11px] ${
-                  item.id === active?.id ? 'bg-ubuntu' : 'bg-white/10 hover:bg-white/15'
+                  item.id === active?.id ? 'bg-accent' : 'bg-white/10 hover:bg-white/15'
                 }`}
               >
                 <span className="max-w-40 truncate">{item.label}</span>

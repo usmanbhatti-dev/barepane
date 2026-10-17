@@ -25,7 +25,7 @@ export default function TransferBar({ sessionId, transfers }: Props) {
           ) : (
             <>
               <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full bg-ubuntu" style={{ width: `${percent(item)}%` }} />
+                <div className="h-full bg-accent" style={{ width: `${percent(item)}%` }} />
               </div>
               <span className="w-10 text-right text-white/50">{item.status === 'done' ? 'Done' : `${percent(item)}%`}</span>
               {item.status === 'running' ? (

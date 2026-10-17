@@ -585,7 +585,7 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
   ]
 
   return (
-    <div className="relative flex h-full min-h-0 flex-col bg-yaru">
+    <div className="relative flex h-full min-h-0 flex-col bg-base">
       <TitleBar
         session={session}
         layout={layout}
@@ -665,7 +665,7 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
                 type="button"
                 aria-label="Resize file list and editor"
                 onMouseDown={startEditorResize}
-                className="h-1.5 shrink-0 cursor-row-resize bg-white/5 hover:bg-ubuntu"
+                className="h-1.5 shrink-0 cursor-row-resize bg-white/5 hover:bg-accent"
               />
               <div className="flex min-h-0 flex-col overflow-hidden" style={{ height: `${editorPct}%` }}>
                 <EditorTabs
@@ -687,7 +687,7 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
             type="button"
             aria-label="Resize panes"
             onMouseDown={startResize}
-            className="w-1.5 shrink-0 cursor-col-resize bg-white/5 hover:bg-ubuntu"
+            className="w-1.5 shrink-0 cursor-col-resize bg-white/5 hover:bg-accent"
           />
         ) : null}
 

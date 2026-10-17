@@ -161,7 +161,7 @@ export default function App() {
                 className={`relative min-h-0 flex-1 flex-col ${slot.key === activeSlot?.key && !adding ? 'flex' : 'hidden'}`}
               >
                 {slot.status !== 'up' ? (
-                  <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-aubergine/80 px-6 text-center">
+                  <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-canvas/80 px-6 text-center">
                     <div className="text-sm font-semibold">
                       {slot.status === 'failed' ? 'Could not reconnect' : 'Reconnecting…'}
                     </div>

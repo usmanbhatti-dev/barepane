@@ -2,15 +2,17 @@
 @import "@xterm/xterm/css/xterm.css";
 
 @theme {
-  --font-sans: "Ubuntu", "Cantarell", "Segoe UI", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: "Ubuntu Mono", "Menlo", "Cascadia Mono", "Courier New", monospace;
-  --color-aubergine: #2c001e;
-  --color-plum: #77216f;
-  --color-ubuntu: #e95420;
-  --color-yaru: #242424;
-  --color-surface: #2c2c2c;
-  --color-surface-2: #1a1a1a;
-  --color-terminal: #300a24;
+  --font-sans: system-ui, -apple-system, "Segoe UI", "Inter", "Cantarell", ui-sans-serif, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Menlo", "Cascadia Mono", "Consolas", "Ubuntu Mono", monospace;
+  --color-canvas: #0f1218;
+  --color-chrome: #0a0d12;
+  --color-base: #151a22;
+  --color-accent: #3d63dd;
+  --color-accent-hover: #5173e8;
+  --color-accent-fg: #8da4ef;
+  --color-surface: #1c222c;
+  --color-surface-2: #11151b;
+  --color-terminal: #0d1117;
   --color-success: #26a269;
   --color-warning: #e5a50a;
   --color-danger: #c01c28;
@@ -32,7 +34,7 @@
     height: 100%;
     margin: 0;
     overflow: hidden;
-    background: var(--color-aubergine);
+    background: var(--color-canvas);
     color: #f6f6f6;
   }
 
@@ -47,12 +49,12 @@
   input:focus-visible,
   textarea:focus-visible,
   select:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--color-ubuntu) 70%, white);
+    outline: 2px solid color-mix(in srgb, var(--color-accent) 70%, white);
     outline-offset: 1px;
   }
 
   * {
-    scrollbar-color: #6b4a5e transparent;
+    scrollbar-color: #3a4252 transparent;
     scrollbar-width: thin;
   }
 
@@ -63,7 +65,7 @@
 
   *::-webkit-scrollbar-thumb {
     border-radius: 999px;
-    background: #6b4a5e;
+    background: #3a4252;
   }
 }
 
@@ -87,8 +89,8 @@
 }
 
 .ui-input:focus {
-  border-color: var(--color-ubuntu);
-  box-shadow: 0 0 0 3px rgb(233 84 32 / 0.22);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgb(61 99 221 / 0.3);
 }
 
 .ui-input:disabled {
@@ -98,7 +100,7 @@
 .ui-check {
   width: 0.95rem;
   height: 0.95rem;
-  accent-color: var(--color-ubuntu);
+  accent-color: var(--color-accent);
 }
 
 .ui-btn {
@@ -115,14 +117,14 @@
 
 .ui-btn-primary {
   border-radius: 0.5rem;
-  background: var(--color-ubuntu);
+  background: var(--color-accent);
   padding: 0.55rem 0.9rem;
   font-weight: 600;
   color: white;
 }
 
 .ui-btn-primary:hover {
-  background: #ff6a33;
+  background: var(--color-accent-hover);
 }
 
 .ui-btn-primary:disabled,
@@ -208,7 +210,7 @@ html:not([data-chrome='mac']):not([data-chrome='win']) .chrome-inset {
   z-index: 2;
   height: 2px;
   overflow: hidden;
-  background: rgba(233, 84, 32, 0.15);
+  background: rgba(61, 99, 221, 0.18);
 }
 
 .file-sync-bar::after {
@@ -216,7 +218,7 @@ html:not([data-chrome='mac']):not([data-chrome='win']) .chrome-inset {
   display: block;
   height: 100%;
   width: 36%;
-  background: #e95420;
+  background: #3d63dd;
   animation: file-sync-slide 0.9s ease-in-out infinite;
 }
 
@@ -258,8 +260,8 @@ html:not([data-chrome='mac']):not([data-chrome='win']) .chrome-inset {
 .tab-spinner {
   border-radius: 999px;
   border-style: solid;
-  border-color: rgba(233, 84, 32, 0.22);
-  border-top-color: #e95420;
+  border-color: rgba(61, 99, 221, 0.25);
+  border-top-color: #8da4ef;
   animation: file-sync-rotate 0.7s linear infinite;
 }
 

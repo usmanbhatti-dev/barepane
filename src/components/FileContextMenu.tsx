@@ -30,7 +30,7 @@ export default function FileContextMenu({ x, y, items, onClose }: Props) {
     >
       <div
         role="menu"
-        className="absolute min-w-52 rounded-lg border border-white/10 bg-[#2b2b2b] py-1 shadow-2xl"
+        className="absolute min-w-52 rounded-lg border border-white/10 bg-surface py-1 shadow-2xl"
         style={{ left, top }}
         onClick={(event) => event.stopPropagation()}
       >
@@ -45,7 +45,7 @@ export default function FileContextMenu({ x, y, items, onClose }: Props) {
               role="menuitem"
               disabled={item.disabled}
               className={`flex w-full items-center justify-between gap-6 px-3 py-1.5 text-left text-[13px] disabled:opacity-40 ${
-                item.danger ? 'text-red-300 hover:bg-red-500/20' : 'text-white/90 hover:bg-ubuntu'
+                item.danger ? 'text-red-300 hover:bg-red-500/20' : 'text-white/90 hover:bg-accent'
               }`}
               onClick={() => {
                 item.onClick()

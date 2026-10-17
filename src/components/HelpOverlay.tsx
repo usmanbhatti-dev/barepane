@@ -47,7 +47,7 @@ export default function HelpOverlay({ open, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/55 px-4" onMouseDown={onClose}>
       <div
-        className="max-h-[min(36rem,88vh)] w-full max-w-lg overflow-y-auto rounded-xl border border-white/10 bg-[#2a2a2a] p-5 shadow-2xl"
+        className="max-h-[min(36rem,88vh)] w-full max-w-lg overflow-y-auto rounded-xl border border-white/10 bg-surface p-5 shadow-2xl"
         onMouseDown={(event) => event.stopPropagation()}
         role="dialog"
         aria-labelledby="help-title"
@@ -58,7 +58,7 @@ export default function HelpOverlay({ open, onClose }: Props) {
               How {APP_NAME} works
             </h2>
             <p className="mt-1 text-sm leading-6 text-white/65">
-              This is a desktop SSH workstation for a headless Ubuntu VPS: files, a tabbed editor, and a real shell in one window. It is not a website and not remote desktop.
+              This is a desktop SSH workstation for your Linux VPS: files, a tabbed editor, and a real shell in one window. Nothing is installed on the server. It is not a website and not remote desktop.
             </p>
           </div>
           <button type="button" className="ui-btn shrink-0" onClick={onClose}>

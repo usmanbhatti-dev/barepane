@@ -46,7 +46,7 @@ export default function CommandPalette({ open, commands, onClose }: Props) {
   return (
     <div className="absolute inset-0 z-[60] flex items-start justify-center bg-black/45 px-4 pt-[12vh]" onMouseDown={onClose}>
       <div
-        className="w-full max-w-lg overflow-hidden rounded-xl border border-white/10 bg-[#2a2a2a]"
+        className="w-full max-w-lg overflow-hidden rounded-xl border border-white/10 bg-surface"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <input
@@ -83,7 +83,7 @@ export default function CommandPalette({ open, commands, onClose }: Props) {
                 <button
                   type="button"
                   className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm ${
-                    i === index ? 'bg-ubuntu/30 text-white' : 'text-white/75 hover:bg-white/6'
+                    i === index ? 'bg-accent/30 text-white' : 'text-white/75 hover:bg-white/6'
                   }`}
                   onMouseEnter={() => setIndex(i)}
                   onClick={() => run(item)}

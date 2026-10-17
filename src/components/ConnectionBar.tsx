@@ -11,13 +11,13 @@ type Props = {
 function tabColor(host: string): string {
   let hash = 0
   for (const char of host) hash = (hash * 31 + char.charCodeAt(0)) >>> 0
-  const palette = ['#E95420', '#19B6EE', '#26A269', '#F5C211', '#C061CB', '#62A0EA']
-  return palette[hash % palette.length] ?? '#E95420'
+  const palette = ['#3D63DD', '#19B6EE', '#26A269', '#F5C211', '#C061CB', '#EF6B5B']
+  return palette[hash % palette.length] ?? '#3D63DD'
 }
 
 export default function ConnectionBar({ sessions, activeId, onSelect, onClose, onAdd }: Props) {
   return (
-    <div className="chrome-inset app-drag flex h-10 shrink-0 items-center gap-2 border-b border-white/10 bg-[#1a0014]">
+    <div className="chrome-inset app-drag flex h-10 shrink-0 items-center gap-2 border-b border-white/10 bg-chrome">
       <div className="app-no-drag flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
         {sessions.map((session) => {
           const active = session.id === activeId

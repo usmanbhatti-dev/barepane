@@ -18,8 +18,8 @@ export default class ErrorBoundary extends Component<Props, State> {
   render() {
     if (!this.state.message) return this.props.children
     return (
-      <div className="flex h-full min-h-0 flex-col bg-aubergine">
-        <div className="chrome-inset app-drag h-10 shrink-0 bg-[#1a0014]" />
+      <div className="flex h-full min-h-0 flex-col bg-canvas">
+        <div className="chrome-inset app-drag h-10 shrink-0 bg-chrome" />
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
           <h1 className="text-lg font-semibold">{APP_NAME} hit a problem</h1>
           <p className="max-w-md text-sm text-white/65">{this.state.message}</p>

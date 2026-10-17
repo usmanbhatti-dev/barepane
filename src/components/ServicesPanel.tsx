@@ -155,7 +155,7 @@ export default function ServicesPanel({ sessionId, open, elevate, onFollow, onCl
                 type="button"
                 onClick={() => setTab(item.id)}
                 className={`rounded-md px-3 py-1 text-xs font-semibold ${
-                  tab === item.id ? 'bg-ubuntu text-white' : 'text-white/65 hover:bg-white/8'
+                  tab === item.id ? 'bg-accent text-white' : 'text-white/65 hover:bg-white/8'
                 }`}
               >
                 {item.label}

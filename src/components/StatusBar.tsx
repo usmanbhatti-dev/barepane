@@ -35,7 +35,7 @@ export default function StatusBar({ stats, notice, tunnelCount = 0, logCount = 0
     : [{ label: 'Status', value: 'Reading remote system…' }]
 
   const noticeClass =
-    notice?.kind === 'error' ? 'text-red-300' : notice?.kind === 'ok' ? 'text-emerald-300' : 'text-ubuntu'
+    notice?.kind === 'error' ? 'text-red-300' : notice?.kind === 'ok' ? 'text-emerald-300' : 'text-accent-fg'
 
   return (
     <div className="flex shrink-0 items-center gap-2 overflow-x-auto border-t border-white/10 bg-surface-2 px-3 py-1.5 text-[11px] text-white/70">
