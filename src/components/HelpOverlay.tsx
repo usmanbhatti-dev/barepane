@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { APP_NAME } from '@shared/brand'
+import AboutPanel from './AboutPanel'
 
 type Props = {
   open: boolean
@@ -88,6 +89,7 @@ export default function HelpOverlay({ open, onClose }: Props) {
             </li>
           ))}
         </ul>
+        <AboutPanel />
       </div>
     </div>
   )

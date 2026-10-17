@@ -4,6 +4,7 @@ import type { ConnectPayload, ConnectResult } from '@shared/types'
 import ConnectionBar from './components/ConnectionBar'
 import DesktopOnly from './components/DesktopOnly'
 import ErrorBoundary from './components/ErrorBoundary'
+import UpdateBanner from './components/UpdateBanner'
 import { desktop, isDesktop } from './lib/desktop'
 import { dropCache, moveCache } from './lib/remoteCache'
 import LoginScreen from './pages/LoginScreen'
@@ -205,6 +206,7 @@ export default function App() {
             onCancel={adding ? () => setAdding(false) : undefined}
           />
         ) : null}
+        <UpdateBanner />
       </div>
     </ErrorBoundary>
   )

@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import type { BarepaneApi, ConnectPayload, TransferProgress } from '../../shared/types'
+import type { UpdateState } from '../../shared/updates'
 
 const api: BarepaneApi = {
   connect: (payload: ConnectPayload) => ipcRenderer.invoke('ssh:connect', payload),
@@ -41,6 +42,18 @@ const api: BarepaneApi = {
   controlCompose: (sessionId, name, action, configFile) =>
     ipcRenderer.invoke('ssh:compose-control', sessionId, name, action, configFile),
   openLocalUrl: (url) => ipcRenderer.invoke('shell:open-local', url),
+  getAppInfo: () => ipcRenderer.invoke('app:info'),
+  getUpdateState: () => ipcRenderer.invoke('app:update-state'),
+  checkForUpdates: () => ipcRenderer.invoke('app:check-updates'),
+  downloadUpdate: () => ipcRenderer.invoke('app:download-update'),
+  installUpdate: () => ipcRenderer.invoke('app:install-update'),
+  setAutoCheckUpdates: (enabled) => ipcRenderer.invoke('app:set-auto-check', enabled),
+  openExternalLink: (id) => ipcRenderer.invoke('app:open-link', id),
+  onUpdateState: (callback) => {
+    const listener = (_event: Electron.IpcRendererEvent, next: UpdateState) => callback(next)
+    ipcRenderer.on('app:update-state-changed', listener)
+    return () => ipcRenderer.removeListener('app:update-state-changed', listener)
+  },
   openShell: (sessionId: string) => ipcRenderer.invoke('ssh:open-shell', sessionId),
   closeShell: (sessionId: string, shellId: string) => ipcRenderer.invoke('ssh:close-shell', sessionId, shellId),
   listShells: (sessionId: string) => ipcRenderer.invoke('ssh:list-shells', sessionId),

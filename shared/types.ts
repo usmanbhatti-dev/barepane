@@ -1,3 +1,6 @@
+import type { ExternalLinkId } from './links.ts'
+import type { AppInfo, UpdateState } from './updates.ts'
+
 export type SshAuth = {
   host: string
   port: number
@@ -305,6 +308,14 @@ export type BarepaneApi = {
   controlPm2: (sessionId: string, name: string, action: Pm2Action) => Promise<void>
   controlCompose: (sessionId: string, name: string, action: ComposeAction, configFile?: string) => Promise<void>
   openLocalUrl: (url: string) => Promise<void>
+  getAppInfo: () => Promise<AppInfo>
+  getUpdateState: () => Promise<UpdateState>
+  checkForUpdates: () => Promise<UpdateState>
+  downloadUpdate: () => Promise<UpdateState>
+  installUpdate: () => Promise<void>
+  setAutoCheckUpdates: (enabled: boolean) => Promise<AppInfo>
+  openExternalLink: (id: ExternalLinkId) => Promise<void>
+  onUpdateState: (callback: (state: UpdateState) => void) => () => void
   openShell: (sessionId: string) => Promise<string>
   closeShell: (sessionId: string, shellId: string) => Promise<void>
   listShells: (sessionId: string) => Promise<string[]>
