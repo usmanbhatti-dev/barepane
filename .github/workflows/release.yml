@@ -1,0 +1,142 @@
+name: Release
+
+# Push a tag like v1.0.0 or v1.1.0-beta.1 to build installers and attach them to a DRAFT release.
+# Nothing becomes public until you review the draft and press "Publish release".
+#
+# Signing is automatic when these repository secrets exist, and skipped (unsigned) when they do not.
+#   macOS:   CSC_LINK, CSC_KEY_PASSWORD (Developer ID Application .p12, base64 or file URL)
+#            APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID (notarization)
+#   Windows: WIN_CSC_LINK, WIN_CSC_KEY_PASSWORD (code signing .pfx)
+# See docs/releasing.md.
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Tag must match package.json version
+        run: |
+          expected="v$(node -p "require('./package.json').version")"
+          if [ "$expected" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version ($expected). Bump the version, commit, and tag again."
+            exit 1
+          fi
+      - name: Changelog must mention this version
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          base="${version%%-*}"
+          if ! grep -q "## \[$base\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no section for $base."
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run audit:prod
+
+  draft:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Create the draft once, up front, so the three build jobs do not race to create three drafts.
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags="--draft"
+          case "$GITHUB_REF_NAME" in *-*) flags="$flags --prerelease" ;; esac
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release already exists, reusing it."
+          else
+            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" $flags \
+              --title "Barepane ${GITHUB_REF_NAME#v}" --generate-notes
+          fi
+
+  build:
+    needs: draft
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            args: --mac
+          - os: windows-latest
+            args: --win
+          - os: ubuntu-latest
+            args: --linux --x64
+          - os: ubuntu-24.04-arm
+            args: --linux --arm64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx vite build
+      - name: Build and upload installers
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          # Empty secrets arrive as empty strings, which electron-builder treats as a bad path. Unset them.
+          for name in CSC_LINK CSC_KEY_PASSWORD WIN_CSC_LINK WIN_CSC_KEY_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID; do
+            if [ -z "${!name}" ]; then unset "$name"; fi
+          done
+          extra=""
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            if [ -n "$CSC_LINK" ] && [ -n "$APPLE_ID" ]; then
+              extra="-c.mac.notarize=true"
+              echo "macOS: signing and notarizing."
+            else
+              extra="-c.mac.identity=null"
+              echo "::warning::macOS secrets not set. Building an UNSIGNED, un-notarized app."
+            fi
+          fi
+          if [ "${{ runner.os }}" = "Windows" ] && [ -z "$WIN_CSC_LINK" ]; then
+            echo "::warning::Windows signing secrets not set. Building an UNSIGNED installer."
+          fi
+          npx electron-builder ${{ matrix.args }} --publish always $extra
+
+  checksums:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Publish SHA256SUMS.txt to the draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir assets && cd assets
+          gh release download "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
+            --pattern '*.dmg' --pattern '*.zip' --pattern '*.exe' --pattern '*.AppImage'
+          sha256sum * | tee SHA256SUMS.txt
+          gh release upload "$GITHUB_REF_NAME" SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" --clobber
+          echo "Draft ready: review it, then press Publish." >> "$GITHUB_STEP_SUMMARY"
