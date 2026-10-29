@@ -140,14 +140,15 @@ Wrong jump credentials → error on login, not a half-open workspace.
 You should see:
 
 - Top strip: server tabs (`user@host`) and **+ Server**
-- Next strip: **Files / Split / Terminal**, then **Health**, **Tunnels**, **Logs**, **Services**, **Apps**, **Help**, **Disconnect**
+- Next strip: **Files / Split / Terminal / Editor**, then **Health**, **Tunnels**, **Logs**, **Services**, **Apps**, **Help**, **Disconnect**
 - Bottom: status bar (host stats, health chip; later tunnel/log counts)
 
 1. **Files** — file tree + editor, no terminal.
 2. **Terminal** — full terminal, no files.
 3. **Split** — both, with a drag handle between them. Drag; after reload the split width should stick (about 30–70%).
-4. Layout choice should persist after disconnect + reconnect.
-5. **Help** or **F1** opens the in-app guide. Escape closes it.
+4. **Editor** — file fills the window (tree and terminal hidden). Empty state if no file is open. **Wrap** toggles long lines (persists). Click a path crumb to open that folder in **Files**.
+5. Layout choice should persist after disconnect + reconnect.
+6. **Help** or **F1** opens the in-app guide. Escape closes it.
 
 On macOS, traffic lights sit in the tab strip. On Windows, window buttons sit on the right of that strip. The window is draggable from the empty chrome.
 
@@ -286,6 +287,7 @@ Invalid port / bind in use → error in the panel, app stays up.
 3. A healthy VPS shows **Looks healthy**. High load, disk ≥85%, failed systemd units, or reboot-required show a warning. A red dot appears on **Health** when it is not OK.
 4. If a failed service is listed, **Logs** opens the Logs panel for that unit.
 5. **Refresh** updates the numbers. The status bar **Health OK / check / alert** chip matches the panel.
+6. If **A reboot is required to finish updates** appears, **Reboot now** (and the header **Reboot**) asks for confirm, then runs `systemctl reboot` (sudo if needed). SSH drops; Barepane should reconnect. Cancel leaves the server running.
 
 ---
 
@@ -296,8 +298,10 @@ Invalid port / bind in use → error in the panel, app stays up.
 3. Pick a **safe** unit you may restart (e.g. a test service). Avoid `ssh` / `networking` on a live VPS unless you have console access.
 4. **Start / Stop / Restart / Enable / Disable** — confirm with `systemctl status` over SSH. Sudo prompt if needed.
 5. **Logs** on a unit jumps into the Logs panel for that unit.
-6. **Docker** tab:
+6. **Docker** tab is a **Refresh** snapshot (does not poll every 10s). Sublists: **Containers**, **Images**, **Volumes**.
    - Installed and running → containers with start/stop/restart and jump to logs.
+   - Click a container name: CPU/memory **limits** and a one-shot stats line (`docker stats --no-stream`). **Refresh stats** re-runs that one exec. The Barepane terminal should stay snappy (no live graphs).
+   - **Images** lists repo:tag, short id, size. **Volumes** lists name, driver, mountpoint (no size).
    - Not installed → note “Docker is not installed”, panel still usable.
    - Daemon down → note that the daemon is not running, not a hard crash of the whole panel.
 

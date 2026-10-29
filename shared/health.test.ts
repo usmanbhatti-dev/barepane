@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { assessHealth, parseHealth } from './health.ts'
+import { assessHealth, parseHealth, REBOOT_COMMAND } from './health.ts'
 
 const SAMPLE = `
 HOST=web-1
@@ -62,6 +62,7 @@ test('flags load, disk, memory, reboot, and failed units', () => {
   assert.equal(health.disk, 'bad')
   assert.equal(health.overall, 'bad')
   assert.ok(health.notes.some((note) => /reboot/i.test(note)))
+  assert.equal(REBOOT_COMMAND, 'systemctl reboot')
   assert.ok(health.notes.some((note) => /failed/i.test(note)))
   assert.ok(health.notes.some((note) => /inodes/i.test(note)))
 })

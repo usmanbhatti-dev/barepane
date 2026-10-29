@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
-import { formatSshError } from '@shared/errors'
+import { formatSshError, isExpectedDisconnect } from '@shared/errors'
 import { assessHealth } from '@shared/health'
 import { shellQuote } from '@shared/paths'
 import { SITES_ENABLED } from '@shared/sites'
@@ -38,7 +38,7 @@ type Props = {
 
 function readLayout(): LayoutMode {
   const saved = localStorage.getItem(LAYOUT_KEY)
-  if (saved === 'files' || saved === 'split' || saved === 'terminal') return saved
+  if (saved === 'files' || saved === 'split' || saved === 'terminal' || saved === 'editor') return saved
   return 'split'
 }
 
@@ -55,6 +55,7 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
   })
   const filesColumnRef = useRef<HTMLElement | null>(null)
   const [layout, setLayout] = useState<LayoutMode>(readLayout)
+  const [wrap, setWrap] = useState(() => localStorage.getItem(STORAGE.editorWrap) !== '0')
   const [cwd, setCwd] = useState(session.home)
   const [stats, setStats] = useState<ServerStats | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
@@ -71,6 +72,7 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
   const [showHealth, setShowHealth] = useState(false)
   const [showApps, setShowApps] = useState(false)
   const [healthError, setHealthError] = useState('')
+  const [rebooting, setRebooting] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [showPalette, setShowPalette] = useState(false)
   useHelpHotkey(showHelp, () => setShowHelp(true), () => setShowHelp(false), active)
@@ -105,6 +107,11 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
   const changeLayout = useCallback((next: LayoutMode) => {
     setLayout(next)
     localStorage.setItem(LAYOUT_KEY, next)
+  }, [])
+
+  const changeWrap = useCallback((next: boolean) => {
+    setWrap(next)
+    localStorage.setItem(STORAGE.editorWrap, next ? '1' : '0')
   }, [])
 
   useEffect(() => {
@@ -480,6 +487,33 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
     })
   }
 
+  async function rebootHost() {
+    if (
+      !window.confirm(
+        'This will restart the VPS now. SSH will drop. Barepane will try to reconnect when the server is back. Continue?',
+      )
+    ) {
+      return
+    }
+    setRebooting(true)
+    setHealthError('')
+    try {
+      await elevate((sudoPassword) => window.barepane.rebootHost(session.id, sudoPassword))
+      flash('Reboot sent. Waiting for the server…', 'info')
+      setShowHealth(false)
+    } catch (err) {
+      if (isExpectedDisconnect(err)) {
+        flash('Reboot sent. Waiting for the server…', 'info')
+        setShowHealth(false)
+      } else {
+        setHealthError(formatSshError(err))
+        flash(formatSshError(err), 'error')
+      }
+    } finally {
+      setRebooting(false)
+    }
+  }
+
   async function runSite(action: SiteAction) {
     try {
       const text = await elevate((sudoPassword) => window.barepane.runSiteAction(session.id, action, sudoPassword))
@@ -543,14 +577,18 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
     window.addEventListener('mouseup', onUp)
   }
 
-  const showFiles = layout !== 'terminal'
-  const showTerminal = layout !== 'files'
+  const showExplorer = layout === 'files' || layout === 'split'
+  const showEditorPane = layout === 'files' || layout === 'split' || layout === 'editor'
+  const showFiles = showExplorer || layout === 'editor'
+  const showTerminal = layout === 'terminal' || layout === 'split'
   const showSplit = layout === 'split'
   const paletteCommands: PaletteCommand[] = [
     { id: 'files', label: 'Show files only', hint: 'Layout', run: () => changeLayout('files') },
     { id: 'split', label: 'Split files and terminal', hint: 'Layout', run: () => changeLayout('split') },
     { id: 'term', label: 'Show terminal only', hint: 'Layout', run: () => changeLayout('terminal') },
+    { id: 'editor', label: 'Show editor only', hint: 'Layout', run: () => changeLayout('editor') },
     { id: 'health', label: 'Open Health', run: () => setShowHealth(true) },
+    { id: 'reboot', label: 'Reboot this server', hint: 'Asks first', run: () => void rebootHost() },
     { id: 'tunnels', label: 'Open Tunnels', run: () => setShowTunnels(true) },
     { id: 'logs', label: 'Open Logs', run: () => setShowLogs(true) },
     { id: 'services', label: 'Open Services', run: () => setShowServices(true) },
@@ -577,7 +615,7 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
       hint: 'Site',
       run: () => {
         setCwd(SITES_ENABLED)
-        if (layout === 'terminal') changeLayout('split')
+        if (layout === 'terminal' || layout === 'editor') changeLayout(layout === 'terminal' ? 'split' : 'files')
         flash('Opened nginx sites-enabled', 'ok')
       },
     },
@@ -602,7 +640,7 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
         onSiteAction={(action) => void runSite(action)}
         onOpenSites={() => {
           setCwd(SITES_ENABLED)
-          if (layout === 'terminal') changeLayout('split')
+          if (layout === 'terminal' || layout === 'editor') changeLayout(layout === 'terminal' ? 'split' : 'files')
           flash('Opened nginx sites-enabled', 'ok')
         }}
         onDisconnect={() => {
@@ -619,6 +657,7 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
           className={`flex min-h-0 min-w-0 flex-col ${showFiles ? '' : 'hidden'} ${showSplit ? 'border-r border-white/10' : ''}`}
           style={showSplit ? { width: `${leftPct}%` } : showFiles ? { width: '100%' } : undefined}
         >
+          {showExplorer ? (
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <FileExplorer
               sessionId={session.id}
@@ -659,18 +698,29 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
               elevate={elevate}
             />
           </div>
-          {tabs.length ? (
-            <>
+          ) : null}
+          {tabs.length && showExplorer ? (
               <button
                 type="button"
                 aria-label="Resize file list and editor"
                 onMouseDown={startEditorResize}
                 className="h-1.5 shrink-0 cursor-row-resize bg-white/5 hover:bg-accent"
               />
-              <div className="flex min-h-0 flex-col overflow-hidden" style={{ height: `${editorPct}%` }}>
+          ) : null}
+          {tabs.length && showEditorPane ? (
+              <div
+                className="flex min-h-0 flex-col overflow-hidden"
+                style={layout === 'editor' ? { flex: 1 } : { height: `${editorPct}%` }}
+              >
                 <EditorTabs
                   tabs={tabs}
                   activePath={activePath}
+                  wrap={wrap}
+                  onWrapChange={changeWrap}
+                  onOpenDir={(dir) => {
+                    setCwd(dir)
+                    if (layout === 'editor') changeLayout('files')
+                  }}
                   onSelect={setActivePath}
                   onChange={(path, content) => patchTab(path, { content })}
                   onSave={(path) => void saveTab(path, tabsRef.current.find((tab) => tab.path === path)?.remoteChanged)}
@@ -678,7 +728,13 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
                   onClose={closeTab}
                 />
               </div>
-            </>
+          ) : layout === 'editor' ? (
+            <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
+              <p className="text-sm text-white/55">Open a file from Files to edit it full page.</p>
+              <button type="button" className="ui-btn" onClick={() => changeLayout('files')}>
+                Files
+              </button>
+            </div>
           ) : null}
         </section>
 
@@ -800,6 +856,8 @@ export default function Workspace({ session, canBroadcast, active = true, onBroa
         stats={stats}
         open={showHealth}
         error={healthError}
+        rebooting={rebooting}
+        onReboot={() => void rebootHost()}
         onClose={() => setShowHealth(false)}
         onRefresh={() => void refreshStats(true)}
         onFollowUnit={(unit) => {

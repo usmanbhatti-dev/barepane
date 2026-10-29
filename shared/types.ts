@@ -173,6 +173,38 @@ export type DockerContainer = {
   ports: string
 }
 
+export type DockerImage = {
+  id: string
+  repository: string
+  tag: string
+  size: string
+  created: string
+}
+
+export type DockerVolume = {
+  name: string
+  driver: string
+  mountpoint: string
+}
+
+export type DockerInventory = {
+  containers: DockerContainer[]
+  images: DockerImage[]
+  volumes: DockerVolume[]
+  missing?: boolean
+  daemon?: boolean
+  error?: string
+}
+
+export type DockerInspect = {
+  name: string
+  cpuLimit: string
+  memoryLimit: string
+  cpuPercent?: string
+  memoryUsage?: string
+  memoryPercent?: string
+}
+
 export type ContainerList = {
   items: DockerContainer[]
   missing?: boolean
@@ -289,6 +321,7 @@ export type BarepaneApi = {
   downloadFile: (sessionId: string, remotePath: string, localPath: string) => Promise<void>
   uploadFile: (sessionId: string, localPath: string, remotePath: string, sudoPassword?: string) => Promise<void>
   runSiteAction: (sessionId: string, action: SiteAction, sudoPassword?: string) => Promise<string>
+  rebootHost: (sessionId: string, sudoPassword?: string) => Promise<void>
   chmod: (sessionId: string, path: string, mode: string, sudoPassword?: string) => Promise<void>
   pickSavePath: (defaultName: string) => Promise<string | null>
   pickDirectory: () => Promise<string | null>
@@ -334,6 +367,8 @@ export type BarepaneApi = {
   listUnits: (sessionId: string, sudoPassword?: string) => Promise<ServiceUnit[]>
   controlUnit: (sessionId: string, unit: string, action: ServiceAction, sudoPassword?: string) => Promise<void>
   listContainers: (sessionId: string, sudoPassword?: string) => Promise<ContainerList>
+  getDockerInventory: (sessionId: string, sudoPassword?: string) => Promise<DockerInventory>
+  inspectContainer: (sessionId: string, name: string, sudoPassword?: string) => Promise<DockerInspect>
   controlContainer: (sessionId: string, name: string, action: ContainerAction, sudoPassword?: string) => Promise<void>
   onTerminalData: (callback: (sessionId: string, shellId: string, data: string) => void) => () => void
   onLogData: (callback: (sessionId: string, logId: string, data: string) => void) => () => void

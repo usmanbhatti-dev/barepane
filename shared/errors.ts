@@ -54,6 +54,18 @@ export function formatSshError(error: unknown): string {
   return message.replace(/^Error:\s*/i, '')
 }
 
+export function isExpectedDisconnect(error: unknown): boolean {
+  const message = (error instanceof Error ? error.message : String(error)).toLowerCase()
+  return (
+    message.includes('no longer connected') ||
+    message.includes('not connected') ||
+    message.includes('missing ssh session') ||
+    message.includes('connection lost') ||
+    message.includes('econnreset') ||
+    message.includes('socket hang up')
+  )
+}
+
 export function isSudoPasswordRequired(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error)
   const lower = message.toLowerCase()
