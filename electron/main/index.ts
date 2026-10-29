@@ -347,6 +347,11 @@ ipcMain.handle('ssh:site-action', async (event, id: string, action: SiteAction, 
   return invoke(() => sessionHub.get(sessionId(id)).runSiteAction(action, optionalSecret(sudoPassword)))
 })
 
+ipcMain.handle('ssh:reboot', async (event, id: string, sudoPassword?: string) => {
+  assertSender(event)
+  return invoke(() => sessionHub.get(sessionId(id)).rebootHost(optionalSecret(sudoPassword)))
+})
+
 ipcMain.handle('ssh:download', async (event, id: string, remotePath: string, localPath: string) => {
   assertSender(event)
   return invoke(() => sessionHub.get(sessionId(id)).downloadFile(remotePath, localPath))
@@ -594,6 +599,16 @@ ipcMain.handle('ssh:units-control', async (event, id: string, unit: string, acti
 ipcMain.handle('ssh:containers-list', async (event, id: string, sudoPassword?: string) => {
   assertSender(event)
   return invoke(() => sessionHub.get(sessionId(id)).listContainers(optionalSecret(sudoPassword)))
+})
+
+ipcMain.handle('ssh:docker-inventory', async (event, id: string, sudoPassword?: string) => {
+  assertSender(event)
+  return invoke(() => sessionHub.get(sessionId(id)).getDockerInventory(optionalSecret(sudoPassword)))
+})
+
+ipcMain.handle('ssh:container-inspect', async (event, id: string, name: string, sudoPassword?: string) => {
+  assertSender(event)
+  return invoke(() => sessionHub.get(sessionId(id)).inspectContainer(name, optionalSecret(sudoPassword)))
 })
 
 ipcMain.handle('ssh:containers-control', async (event, id: string, name: string, action: ContainerAction, sudoPassword?: string) => {

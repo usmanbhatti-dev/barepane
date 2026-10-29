@@ -5,7 +5,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
-## [0.9.0] - Unreleased
+## [1.0.0] - 2026-10-29
+
+First stable release.
+
+### Added
+- Services → Docker: on-demand snapshot of containers, images, and named volumes. Expand a container for CPU and memory limits plus a one-shot `docker stats` line
+- Editor layout: the file fills the window, with wrap toggle and a path breadcrumb that jumps back to Files
+- Health: **Reboot** asks first, then runs `systemctl reboot`. Also on the note when updates require a restart, and in the command palette
+
+### Changed
+- Docker in Services no longer polls every 10 seconds. Use **Refresh** when you want a new snapshot
+
+### Fixed
+- macOS terminal ⌘V pasted the clipboard twice (custom paste plus the Edit menu)
+
+## [0.9.0] - 2026-10-17
 
 First public beta. Barepane is a desktop workstation for your Linux VPS: files, editor, and a real terminal over plain
 SSH, with nothing installed on the server.

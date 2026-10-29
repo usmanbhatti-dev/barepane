@@ -13,20 +13,24 @@ import { normalizePath, shellQuote } from '../../shared/paths'
 import { parseLogDraft, buildLogCommand, logLabel, MAX_LOG_STREAMS } from '../../shared/logs'
 import {
   buildContainerCommand,
+  buildContainerInspectCommand,
   buildContainerListCommand,
   buildUnitCommand,
   buildUnitListCommand,
+  DOCKER_INVENTORY_SCRIPT,
   looksDockerDaemonDown,
   looksMissingDocker,
   looksServicePermission,
   parseContainerAction,
   parseContainerName,
+  parseDockerInspect,
+  parseDockerInventory,
   parseDockerPs,
   parseServiceAction,
   parseSystemctlList,
   parseUnitName,
 } from '../../shared/services'
-import { parseHealth, HEALTH_SCRIPT, STATS_SCRIPT } from '../../shared/health'
+import { parseHealth, HEALTH_SCRIPT, REBOOT_COMMAND, STATS_SCRIPT } from '../../shared/health'
 import {
   buildComposeCommand,
   buildPm2Command,
@@ -48,6 +52,8 @@ import type {
   ContainerAction,
   ContainerList,
   ContentHit,
+  DockerInspect,
+  DockerInventory,
   FileStat,
   LogDraft,
   LogStreamInfo,
@@ -707,6 +713,26 @@ export class SshSession {
     return { items: parseDockerPs(text) }
   }
 
+  async getDockerInventory(sudoPassword?: string): Promise<DockerInventory> {
+    const { code, text } = await this.execMaybeSudo(DOCKER_INVENTORY_SCRIPT, sudoPassword)
+    if (looksServicePermission(text)) throw new Error('Sudo password required.')
+    const parsed = parseDockerInventory(text)
+    if (parsed.missing || parsed.daemon) return parsed
+    if (code && code !== 0 && !parsed.containers.length && !parsed.images.length && !parsed.volumes.length) {
+      return { ...parsed, error: text.replace(/\s+/g, ' ').trim().slice(0, 220) || `docker inventory failed (${code}).` }
+    }
+    return parsed
+  }
+
+  async inspectContainer(name: string, sudoPassword?: string): Promise<DockerInspect> {
+    const parsedName = parseContainerName(name)
+    const { text } = await this.execMaybeSudo(buildContainerInspectCommand(parsedName), sudoPassword)
+    if (looksMissingDocker(text)) throw new Error('Docker is not installed.')
+    if (looksDockerDaemonDown(text)) throw new Error('Docker is installed but the daemon is not running.')
+    if (looksServicePermission(text)) throw new Error('Sudo password required.')
+    return parseDockerInspect(text, parsedName)
+  }
+
   async controlContainer(name: string, action: ContainerAction, sudoPassword?: string): Promise<void> {
     const command = buildContainerCommand(parseContainerAction(action), parseContainerName(name))
     const { code, text } = await this.execMaybeSudo(command, sudoPassword)
@@ -910,6 +936,30 @@ export class SshSession {
       throw new Error(text.slice(0, 400) || `${action} failed.`)
     }
     return text || 'Done.'
+  }
+
+  async rebootHost(sudoPassword?: string): Promise<void> {
+    try {
+      const { code, text } = await this.execMaybeSudo(REBOOT_COMMAND, sudoPassword)
+      if (looksServicePermission(text)) throw new Error('Sudo password required.')
+      if (code && code !== 0) {
+        throw new Error(text.replace(/\s+/g, ' ').trim().slice(0, 220) || 'Reboot failed.')
+      }
+    } catch (err) {
+      if (looksServicePermission(err instanceof Error ? err.message : String(err))) {
+        throw new Error('Sudo password required.')
+      }
+      const lower = (err instanceof Error ? err.message : String(err)).toLowerCase()
+      if (
+        lower.includes('not connected') ||
+        lower.includes('no longer connected') ||
+        lower.includes('econnreset') ||
+        lower.includes('socket hang up')
+      ) {
+        return
+      }
+      throw err
+    }
   }
 
   async downloadFile(remotePath: string, localPath: string): Promise<void> {

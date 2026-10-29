@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { SITE_ACTIONS, SITES_ENABLED, siteActionLabel } from '@shared/sites'
 import type { ConnectResult, SiteAction } from '@shared/types'
 
-export type LayoutMode = 'files' | 'split' | 'terminal'
+export type LayoutMode = 'files' | 'split' | 'terminal' | 'editor'
 
 type Props = {
   session: ConnectResult
@@ -26,6 +26,7 @@ const LAYOUTS: { id: LayoutMode; label: string }[] = [
   { id: 'files', label: 'Files' },
   { id: 'split', label: 'Split' },
   { id: 'terminal', label: 'Terminal' },
+  { id: 'editor', label: 'Editor' },
 ]
 
 export default function TitleBar({

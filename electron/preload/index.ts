@@ -21,6 +21,7 @@ const api: BarepaneApi = {
   uploadFile: (sessionId: string, localPath: string, remotePath: string, sudoPassword?: string) =>
     ipcRenderer.invoke('ssh:upload', sessionId, localPath, remotePath, sudoPassword),
   runSiteAction: (sessionId, action, sudoPassword) => ipcRenderer.invoke('ssh:site-action', sessionId, action, sudoPassword),
+  rebootHost: (sessionId, sudoPassword) => ipcRenderer.invoke('ssh:reboot', sessionId, sudoPassword),
   chmod: (sessionId: string, targetPath: string, mode: string, sudoPassword?: string) =>
     ipcRenderer.invoke('ssh:chmod', sessionId, targetPath, mode, sudoPassword),
   pickSavePath: (defaultName: string) => ipcRenderer.invoke('dialog:save', defaultName),
@@ -76,6 +77,8 @@ const api: BarepaneApi = {
   controlUnit: (sessionId: string, unit: string, action, sudoPassword?: string) =>
     ipcRenderer.invoke('ssh:units-control', sessionId, unit, action, sudoPassword),
   listContainers: (sessionId: string, sudoPassword?: string) => ipcRenderer.invoke('ssh:containers-list', sessionId, sudoPassword),
+  getDockerInventory: (sessionId, sudoPassword) => ipcRenderer.invoke('ssh:docker-inventory', sessionId, sudoPassword),
+  inspectContainer: (sessionId, name, sudoPassword) => ipcRenderer.invoke('ssh:container-inspect', sessionId, name, sudoPassword),
   controlContainer: (sessionId: string, name: string, action, sudoPassword?: string) =>
     ipcRenderer.invoke('ssh:containers-control', sessionId, name, action, sudoPassword),
   onTerminalData: (callback) => {

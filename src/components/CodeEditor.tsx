@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { HighlightStyle, bracketMatching, foldGutter, indentOnInput, syntaxHighlighting } from '@codemirror/language'
 import { gotoLine, highlightSelectionMatches, search, searchKeymap } from '@codemirror/search'
-import { EditorState } from '@codemirror/state'
+import { Compartment, EditorState } from '@codemirror/state'
 import {
   EditorView,
   drawSelection,
@@ -20,6 +20,7 @@ type Props = {
   path: string
   value: string
   revealLine?: number
+  wrap?: boolean
   onChange: (value: string) => void
 }
 
@@ -189,9 +190,10 @@ function reveal(view: EditorView, lineNo: number) {
   })
 }
 
-export default function CodeEditor({ path, value, revealLine, onChange }: Props) {
+export default function CodeEditor({ path, value, revealLine, wrap = true, onChange }: Props) {
   const parentRef = useRef<HTMLDivElement | null>(null)
   const viewRef = useRef<EditorView | null>(null)
+  const wrapRef = useRef(new Compartment())
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
 
@@ -215,7 +217,7 @@ export default function CodeEditor({ path, value, revealLine, onChange }: Props)
           bracketMatching(),
           highlightSelectionMatches(),
           search({ top: true }),
-          EditorView.lineWrapping,
+          wrapRef.current.of(wrap ? EditorView.lineWrapping : []),
           languageExtension(detectLanguage(path)),
           syntaxHighlighting(highlightStyle),
           editorTheme,
@@ -242,6 +244,14 @@ export default function CodeEditor({ path, value, revealLine, onChange }: Props)
     // Recreate when the file (and therefore language) changes. Value is synced below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path])
+
+  useEffect(() => {
+    const view = viewRef.current
+    if (!view) return
+    view.dispatch({
+      effects: wrapRef.current.reconfigure(wrap ? EditorView.lineWrapping : []),
+    })
+  }, [wrap])
 
   useEffect(() => {
     const view = viewRef.current

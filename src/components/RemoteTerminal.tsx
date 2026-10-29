@@ -97,6 +97,14 @@ export default function RemoteTerminal({ sessionId, shellId, visible = true, sea
       window.barepane.writeTerminal(sessionId, shellId, text.replace(/\r?\n/g, '\r'))
     }
 
+    let pasteAt = 0
+    function requestPaste(): void {
+      const now = Date.now()
+      if (now - pasteAt < 120) return
+      pasteAt = now
+      void pasteClipboard()
+    }
+
     term.attachCustomKeyEventHandler((event) => {
       if (event.type !== 'keydown') return true
       const key = event.key.toLowerCase()
@@ -111,17 +119,24 @@ export default function RemoteTerminal({ sessionId, shellId, visible = true, sea
         return false
       }
       if (pasteKey) {
-        void pasteClipboard()
+        requestPaste()
         return false
       }
       return true
     })
 
+    const onPaste = (event: Event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      requestPaste()
+    }
+    node.addEventListener('paste', onPaste, true)
+
     const onContextMenu = (event: MouseEvent) => {
       event.preventDefault()
       event.stopPropagation()
       if (term.hasSelection()) void copySelection()
-      else void pasteClipboard()
+      else requestPaste()
     }
     node.addEventListener('contextmenu', onContextMenu)
 
@@ -140,6 +155,7 @@ export default function RemoteTerminal({ sessionId, shellId, visible = true, sea
     return () => {
       cancelAnimationFrame(frame)
       observer.disconnect()
+      node.removeEventListener('paste', onPaste, true)
       node.removeEventListener('contextmenu', onContextMenu)
       offResults.dispose()
       onData.dispose()

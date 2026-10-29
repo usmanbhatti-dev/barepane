@@ -1,6 +1,6 @@
 {
   "name": "barepane",
-  "version": "0.9.0-beta.1",
+  "version": "1.0.0",
   "private": true,
   "description": "Desktop workstation for your Linux VPS: files, editor, and a real terminal over plain SSH. Nothing to install on the server.",
   "license": "MIT",

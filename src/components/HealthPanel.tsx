@@ -8,6 +8,8 @@ type Props = {
   onClose: () => void
   onRefresh: () => void
   onFollowUnit?: (unit: string) => void
+  onReboot?: () => void
+  rebooting?: boolean
 }
 
 function tone(level: HealthLevel): string {
@@ -40,7 +42,7 @@ function loadPercent(stats: ServerStats): number {
   return Math.min(100, Math.round((stats.load1 / n) * 100))
 }
 
-export default function HealthPanel({ stats, open, error, onClose, onRefresh, onFollowUnit }: Props) {
+export default function HealthPanel({ stats, open, error, onClose, onRefresh, onFollowUnit, onReboot, rebooting }: Props) {
   if (!open) return null
   const health = stats ? assessHealth(stats) : null
   const headline = health?.overall === 'bad' ? 'Needs attention' : health?.overall === 'warn' ? 'Check this server' : 'Looks healthy'
@@ -57,6 +59,11 @@ export default function HealthPanel({ stats, open, error, onClose, onRefresh, on
             <p className={`text-[11px] ${health ? tone(health.overall) : 'text-white/45'}`}>{stats ? headline : 'Reading remote system…'}</p>
           </div>
           <div className="flex gap-2">
+            {onReboot ? (
+              <button type="button" className="ui-btn" disabled={rebooting} onClick={onReboot}>
+                {rebooting ? 'Rebooting…' : 'Reboot'}
+              </button>
+            ) : null}
             <button type="button" className="ui-btn" onClick={onRefresh}>
               Refresh
             </button>
@@ -74,8 +81,18 @@ export default function HealthPanel({ stats, open, error, onClose, onRefresh, on
               {health?.notes.length ? (
                 <ul className="space-y-1">
                   {health.notes.map((note) => (
-                    <li key={note} className="rounded-lg border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-                      {note}
+                    <li key={note} className="flex items-center justify-between gap-2 rounded-lg border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+                      <span>{note}</span>
+                      {onReboot && /reboot/i.test(note) ? (
+                        <button
+                          type="button"
+                          className="shrink-0 rounded-md bg-white/10 px-2 py-0.5 font-semibold hover:bg-white/15 disabled:opacity-40"
+                          disabled={rebooting}
+                          onClick={onReboot}
+                        >
+                          {rebooting ? 'Rebooting…' : 'Reboot now'}
+                        </button>
+                      ) : null}
                     </li>
                   ))}
                 </ul>

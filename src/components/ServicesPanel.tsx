@@ -1,8 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { formatSshError } from '@shared/errors'
-import type { ContainerAction, DockerContainer, ServiceAction, ServiceUnit } from '@shared/types'
+import type {
+  ContainerAction,
+  DockerContainer,
+  DockerImage,
+  DockerInspect,
+  DockerVolume,
+  ServiceAction,
+  ServiceUnit,
+} from '@shared/types'
 
 type Tab = 'systemd' | 'docker'
+type DockerView = 'containers' | 'images' | 'volumes'
 
 type Props = {
   sessionId: string
@@ -29,17 +38,34 @@ function dockerClass(status: string): string {
 
 export default function ServicesPanel({ sessionId, open, elevate, onFollow, onClose }: Props) {
   const [tab, setTab] = useState<Tab>('systemd')
+  const [dockerView, setDockerView] = useState<DockerView>('containers')
   const [units, setUnits] = useState<ServiceUnit[]>([])
   const [containers, setContainers] = useState<DockerContainer[]>([])
+  const [images, setImages] = useState<DockerImage[]>([])
+  const [volumes, setVolumes] = useState<DockerVolume[]>([])
   const [dockerNote, setDockerNote] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [working, setWorking] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [showInactive, setShowInactive] = useState(false)
+  const [openName, setOpenName] = useState<string | null>(null)
+  const [inspect, setInspect] = useState<Record<string, DockerInspect>>({})
+  const [inspectBusy, setInspectBusy] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!open || !window.barepane) return
+    setUnits([])
+    setContainers([])
+    setImages([])
+    setVolumes([])
+    setDockerNote('')
+    setError('')
+    setOpenName(null)
+    setInspect({})
+  }, [sessionId])
+
+  useEffect(() => {
+    if (!open || !window.barepane || tab !== 'systemd') return
     let cancelled = false
     const load = async (quiet = false) => {
       if (document.visibilityState === 'hidden') return
@@ -50,20 +76,6 @@ export default function ServicesPanel({ sessionId, open, elevate, onFollow, onCl
         if (!cancelled) setUnits(nextUnits)
       } catch (err) {
         if (!cancelled && !quiet) setError(formatSshError(err))
-      }
-      try {
-        const next = await elevate((sudoPassword) => window.barepane.listContainers(sessionId, sudoPassword))
-        if (cancelled) return
-        setContainers(next.items)
-        setDockerNote(
-          next.missing
-            ? 'Docker is not installed on this server.'
-            : next.daemon
-              ? 'Docker is installed but the daemon is not running.'
-              : next.error || '',
-        )
-      } catch (err) {
-        if (!cancelled && !quiet) setDockerNote(formatSshError(err))
       } finally {
         if (!cancelled) setBusy(false)
       }
@@ -74,7 +86,39 @@ export default function ServicesPanel({ sessionId, open, elevate, onFollow, onCl
       cancelled = true
       window.clearInterval(timer)
     }
-  }, [open, sessionId, elevate])
+  }, [open, tab, sessionId, elevate])
+
+  useEffect(() => {
+    if (!open || !window.barepane || tab !== 'docker') return
+    let cancelled = false
+    const load = async () => {
+      if (document.visibilityState === 'hidden') return
+      setBusy(true)
+      setError('')
+      try {
+        const next = await elevate((sudoPassword) => window.barepane.getDockerInventory(sessionId, sudoPassword))
+        if (cancelled) return
+        setContainers(next.containers)
+        setImages(next.images)
+        setVolumes(next.volumes)
+        setDockerNote(
+          next.missing
+            ? 'Docker is not installed on this server.'
+            : next.daemon
+              ? 'Docker is installed but the daemon is not running.'
+              : next.error || '',
+        )
+      } catch (err) {
+        if (!cancelled) setDockerNote(formatSshError(err))
+      } finally {
+        if (!cancelled) setBusy(false)
+      }
+    }
+    void load()
+    return () => {
+      cancelled = true
+    }
+  }, [open, tab, sessionId, elevate])
 
   const visibleUnits = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -99,6 +143,42 @@ export default function ServicesPanel({ sessionId, open, elevate, onFollow, onCl
     )
   }, [containers, query])
 
+  const visibleImages = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return images.filter(
+      (item) => !q || item.repository.toLowerCase().includes(q) || item.tag.toLowerCase().includes(q) || item.id.includes(q),
+    )
+  }, [images, query])
+
+  const visibleVolumes = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return volumes.filter(
+      (item) => !q || item.name.toLowerCase().includes(q) || item.mountpoint.toLowerCase().includes(q),
+    )
+  }, [volumes, query])
+
+  async function refreshDocker() {
+    setBusy(true)
+    setError('')
+    try {
+      const next = await elevate((sudoPassword) => window.barepane.getDockerInventory(sessionId, sudoPassword))
+      setContainers(next.containers)
+      setImages(next.images)
+      setVolumes(next.volumes)
+      setDockerNote(
+        next.missing
+          ? 'Docker is not installed on this server.'
+          : next.daemon
+            ? 'Docker is installed but the daemon is not running.'
+            : next.error || '',
+      )
+    } catch (err) {
+      setDockerNote(formatSshError(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
   async function runUnit(unit: string, action: ServiceAction) {
     setWorking(`${unit}:${action}`)
     setError('')
@@ -117,14 +197,34 @@ export default function ServicesPanel({ sessionId, open, elevate, onFollow, onCl
     setError('')
     try {
       await elevate((sudoPassword) => window.barepane.controlContainer(sessionId, name, action, sudoPassword))
-      const next = await elevate((sudoPassword) => window.barepane.listContainers(sessionId, sudoPassword))
-      setContainers(next.items)
-      setDockerNote(next.missing ? 'Docker is not installed on this server.' : next.daemon ? 'Docker is installed but the daemon is not running.' : next.error || '')
+      await refreshDocker()
     } catch (err) {
       setError(formatSshError(err))
     } finally {
       setWorking(null)
     }
+  }
+
+  async function loadInspect(name: string) {
+    setInspectBusy(name)
+    setError('')
+    try {
+      const next = await elevate((sudoPassword) => window.barepane.inspectContainer(sessionId, name, sudoPassword))
+      setInspect((current) => ({ ...current, [name]: next }))
+    } catch (err) {
+      setError(formatSshError(err))
+    } finally {
+      setInspectBusy(null)
+    }
+  }
+
+  function toggleContainer(name: string) {
+    if (openName === name) {
+      setOpenName(null)
+      return
+    }
+    setOpenName(name)
+    if (!inspect[name]) void loadInspect(name)
   }
 
   if (!open) return null
@@ -138,11 +238,20 @@ export default function ServicesPanel({ sessionId, open, elevate, onFollow, onCl
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
           <div>
             <h2 className="text-sm font-semibold">Services</h2>
-            <p className="text-[11px] text-white/45">systemd units and Docker containers</p>
+            <p className="text-[11px] text-white/45">
+              {tab === 'docker' ? 'On demand — Refresh to snapshot Docker' : 'systemd units and Docker containers'}
+            </p>
           </div>
-          <button type="button" className="ui-btn" onClick={onClose}>
-            Close
-          </button>
+          <div className="flex gap-2">
+            {tab === 'docker' ? (
+              <button type="button" className="ui-btn" disabled={busy} onClick={() => void refreshDocker()}>
+                {busy ? 'Reading…' : 'Refresh'}
+              </button>
+            ) : null}
+            <button type="button" className="ui-btn" onClick={onClose}>
+              Close
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2">
           <div className="flex rounded-lg bg-black/30 p-0.5">
@@ -169,7 +278,26 @@ export default function ServicesPanel({ sessionId, open, elevate, onFollow, onCl
             <input type="checkbox" checked={showInactive} onChange={(event) => setShowInactive(event.target.checked)} className="ui-check" />
             Show inactive
           </label>
-        ) : null}
+        ) : (
+          <div className="flex gap-1 border-b border-white/10 px-4 py-2">
+            {([
+              { id: 'containers', label: `Containers ${containers.length ? containers.length : ''}` },
+              { id: 'images', label: `Images ${images.length ? images.length : ''}` },
+              { id: 'volumes', label: `Volumes ${volumes.length ? volumes.length : ''}` },
+            ] as const).map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setDockerView(item.id)}
+                className={`rounded-md px-2.5 py-1 text-[11px] font-semibold ${
+                  dockerView === item.id ? 'bg-accent text-white' : 'text-white/60 hover:bg-white/8'
+                }`}
+              >
+                {item.label.trim()}
+              </button>
+            ))}
+          </div>
+        )}
         {error ? <p className="px-4 pb-2 text-sm text-red-300">{error}</p> : null}
         <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-3">
           {tab === 'systemd' ? (
@@ -219,45 +347,110 @@ export default function ServicesPanel({ sessionId, open, elevate, onFollow, onCl
             ) : (
               <p className="px-1 pt-6 text-sm text-white/45">{busy ? 'Reading services…' : 'No matching services.'}</p>
             )
-          ) : dockerNote && !containers.length ? (
+          ) : dockerNote && !containers.length && !images.length && !volumes.length ? (
             <p className="px-1 pt-6 text-sm text-white/45">{dockerNote}</p>
-          ) : visibleContainers.length ? (
-            <ul className="space-y-1">
-              {visibleContainers.map((item) => {
-                const up = item.status.toLowerCase().startsWith('up')
-                return (
-                  <li key={item.id} className="rounded-lg bg-white/6 px-3 py-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <div className="truncate font-mono text-[13px]">{item.name}</div>
-                        <div className="truncate text-[11px] text-white/45">{item.image}</div>
-                        {item.ports ? <div className="truncate text-[11px] text-white/35">{item.ports}</div> : null}
+          ) : dockerView === 'containers' ? (
+            visibleContainers.length ? (
+              <ul className="space-y-1">
+                {visibleContainers.map((item) => {
+                  const up = item.status.toLowerCase().startsWith('up')
+                  const detail = inspect[item.name]
+                  const expanded = openName === item.name
+                  return (
+                    <li key={item.id} className="rounded-lg bg-white/6 px-3 py-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <button type="button" className="min-w-0 text-left" onClick={() => toggleContainer(item.name)}>
+                          <div className="truncate font-mono text-[13px]">{item.name}</div>
+                          <div className="truncate text-[11px] text-white/45">{item.image}</div>
+                          {item.ports ? <div className="truncate text-[11px] text-white/35">{item.ports}</div> : null}
+                        </button>
+                        <span className={`shrink-0 text-[11px] font-semibold ${dockerClass(item.status)}`}>{item.status}</span>
                       </div>
-                      <span className={`shrink-0 text-[11px] font-semibold ${dockerClass(item.status)}`}>{item.status}</span>
+                      {expanded ? (
+                        <div className="mt-2 rounded-md bg-black/25 px-2 py-1.5 text-[11px] text-white/65">
+                          {inspectBusy === item.name && !detail ? (
+                            <p>Reading limits…</p>
+                          ) : detail ? (
+                            <div className="space-y-0.5">
+                              <div>CPU limit {detail.cpuLimit}</div>
+                              <div>Memory limit {detail.memoryLimit}</div>
+                              {detail.cpuPercent ? (
+                                <div>
+                                  Now {detail.cpuPercent} CPU
+                                  {detail.memoryUsage ? ` · ${detail.memoryUsage}` : ''}
+                                  {detail.memoryPercent ? ` (${detail.memoryPercent})` : ''}
+                                </div>
+                              ) : (
+                                <div className="text-white/40">Live usage only while the container is running.</div>
+                              )}
+                              <button
+                                type="button"
+                                className="mt-1 text-accent hover:text-white"
+                                disabled={inspectBusy === item.name}
+                                onClick={() => void loadInspect(item.name)}
+                              >
+                                {inspectBusy === item.name ? 'Reading…' : 'Refresh stats'}
+                              </button>
+                            </div>
+                          ) : (
+                            <p>Could not read inspect for this container.</p>
+                          )}
+                        </div>
+                      ) : null}
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {up ? (
+                          <button type="button" className="ui-btn px-2 py-0.5 text-[11px]" disabled={Boolean(working)} onClick={() => void runContainer(item.name, 'stop')}>
+                            Stop
+                          </button>
+                        ) : (
+                          <button type="button" className="ui-btn px-2 py-0.5 text-[11px]" disabled={Boolean(working)} onClick={() => void runContainer(item.name, 'start')}>
+                            Start
+                          </button>
+                        )}
+                        <button type="button" className="ui-btn px-2 py-0.5 text-[11px]" disabled={Boolean(working)} onClick={() => void runContainer(item.name, 'restart')}>
+                          Restart
+                        </button>
+                        <button type="button" className="ui-btn px-2 py-0.5 text-[11px]" onClick={() => onFollow({ kind: 'docker', container: item.name })}>
+                          Logs
+                        </button>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            ) : (
+              <p className="px-1 pt-6 text-sm text-white/45">{busy ? 'Reading containers…' : 'No matching containers.'}</p>
+            )
+          ) : dockerView === 'images' ? (
+            visibleImages.length ? (
+              <ul className="space-y-1">
+                {visibleImages.map((item) => (
+                  <li key={`${item.id}-${item.repository}-${item.tag}`} className="rounded-lg bg-white/6 px-3 py-2">
+                    <div className="truncate font-mono text-[13px]">
+                      {item.repository}:{item.tag}
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {up ? (
-                        <button type="button" className="ui-btn px-2 py-0.5 text-[11px]" disabled={Boolean(working)} onClick={() => void runContainer(item.name, 'stop')}>
-                          Stop
-                        </button>
-                      ) : (
-                        <button type="button" className="ui-btn px-2 py-0.5 text-[11px]" disabled={Boolean(working)} onClick={() => void runContainer(item.name, 'start')}>
-                          Start
-                        </button>
-                      )}
-                      <button type="button" className="ui-btn px-2 py-0.5 text-[11px]" disabled={Boolean(working)} onClick={() => void runContainer(item.name, 'restart')}>
-                        Restart
-                      </button>
-                      <button type="button" className="ui-btn px-2 py-0.5 text-[11px]" onClick={() => onFollow({ kind: 'docker', container: item.name })}>
-                        Logs
-                      </button>
+                    <div className="text-[11px] text-white/45">
+                      {item.id} · {item.size}
+                      {item.created ? ` · ${item.created}` : ''}
                     </div>
                   </li>
-                )
-              })}
+                ))}
+              </ul>
+            ) : (
+              <p className="px-1 pt-6 text-sm text-white/45">{busy ? 'Reading images…' : 'No matching images.'}</p>
+            )
+          ) : visibleVolumes.length ? (
+            <ul className="space-y-1">
+              {visibleVolumes.map((item) => (
+                <li key={item.name} className="rounded-lg bg-white/6 px-3 py-2">
+                  <div className="truncate font-mono text-[13px]">{item.name}</div>
+                  <div className="truncate text-[11px] text-white/45">{item.driver}</div>
+                  {item.mountpoint ? <div className="truncate font-mono text-[11px] text-white/35">{item.mountpoint}</div> : null}
+                </li>
+              ))}
             </ul>
           ) : (
-            <p className="px-1 pt-6 text-sm text-white/45">{busy ? 'Reading containers…' : 'No matching containers.'}</p>
+            <p className="px-1 pt-6 text-sm text-white/45">{busy ? 'Reading volumes…' : 'No matching volumes.'}</p>
           )}
         </div>
       </aside>

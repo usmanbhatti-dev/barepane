@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { detectLanguage, languageLabel } from '@shared/languages'
+import { parentDir, pathSegments } from '@shared/paths'
 import { lineCount } from '../lib/files'
 import CodeEditor from './CodeEditor'
 
@@ -25,9 +26,23 @@ type Props = {
   onSave: (path: string) => void
   onReload: (path: string) => void
   onClose: (path: string) => void
+  wrap?: boolean
+  onWrapChange?: (wrap: boolean) => void
+  onOpenDir?: (path: string) => void
 }
 
-export default function EditorTabs({ tabs, activePath, onSelect, onChange, onSave, onReload, onClose }: Props) {
+export default function EditorTabs({
+  tabs,
+  activePath,
+  onSelect,
+  onChange,
+  onSave,
+  onReload,
+  onClose,
+  wrap = true,
+  onWrapChange,
+  onOpenDir,
+}: Props) {
   const active = tabs.find((tab) => tab.path === activePath) ?? tabs[0]
   const dirty = Boolean(active && active.content !== active.original)
 
@@ -114,7 +129,40 @@ export default function EditorTabs({ tabs, activePath, onSelect, onChange, onSav
         ) : null}
 
         <div className="flex items-center gap-2 border-b border-white/10 px-3 py-1.5 text-xs">
-          <span className="min-w-0 flex-1 truncate font-mono text-white/55">{active.path}</span>
+          <nav className="flex min-w-0 flex-1 items-center overflow-x-auto font-mono text-white/55" aria-label="File path">
+            <button
+              type="button"
+              className="shrink-0 hover:text-white"
+              onClick={() => onOpenDir?.('/')}
+            >
+              /
+            </button>
+            {pathSegments(active.path).map((part, index, parts) => {
+              const dir = index === parts.length - 1 ? parentDir(active.path) : `/${parts.slice(0, index + 1).join('/')}`
+              return (
+                <span key={`${dir}-${part}`} className="flex min-w-0 shrink-0 items-center">
+                  {index > 0 ? <span className="px-0.5 text-white/25">/</span> : null}
+                  <button
+                    type="button"
+                    title={dir}
+                    className={`max-w-[9rem] truncate hover:text-white ${index === parts.length - 1 ? 'text-white/80' : ''}`}
+                    onClick={() => onOpenDir?.(dir)}
+                  >
+                    {part}
+                  </button>
+                </span>
+              )
+            })}
+          </nav>
+          {onWrapChange ? (
+            <button
+              type="button"
+              className={`shrink-0 rounded-md px-2 py-1 font-semibold ${wrap ? 'bg-white/10 text-white' : 'text-white/45 hover:bg-white/8'}`}
+              onClick={() => onWrapChange(!wrap)}
+            >
+              Wrap
+            </button>
+          ) : null}
           <button
             type="button"
             disabled={active.loading || !dirty || active.saving}
@@ -135,6 +183,7 @@ export default function EditorTabs({ tabs, activePath, onSelect, onChange, onSav
             path={active.path}
             value={active.content}
             revealLine={active.revealLine}
+            wrap={wrap}
             onChange={(content) => onChange(active.path, content)}
           />
         )}

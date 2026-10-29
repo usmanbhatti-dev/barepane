@@ -1,5 +1,8 @@
 import type { DiskMount, HealthLevel, ServerStats, TopProcess } from './types.ts'
 
+/** Fixed command — no user input. Needs sudo on most VPS accounts. */
+export const REBOOT_COMMAND = 'systemctl reboot'
+
 /** Cheap status-bar snapshot. Full process/disk/service detail is HEALTH_SCRIPT. */
 export const STATS_SCRIPT = [
   'printf "HOST=%s\\n" "$(hostname 2>/dev/null || echo unknown)"',

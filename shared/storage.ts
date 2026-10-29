@@ -8,6 +8,7 @@ export const STORAGE = {
   editorSplit: 'barepane.editor-split',
   termSplit: 'barepane.term-split',
   layout: 'barepane.layout',
+  editorWrap: 'barepane.editor-wrap',
   hidden: 'barepane.hidden',
   helpSeen: 'barepane.help-seen',
 } as const
